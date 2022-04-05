@@ -7,6 +7,7 @@ const MapComponent = () => {
   const { state, dispatch } = useAppContext();
   const [routeData, setRouteData] = useState("");
   const mapRef = useRef();
+
   const marker2 =
     state.itinerary?.length > 0
       ? state.itinerary[state.itinerary.length - 1][1]["coordinates"]
@@ -21,6 +22,8 @@ const MapComponent = () => {
     latitude: "52.5200",
     longitude: "13.4050",
     zoom: 7,
+    width: "100%",
+    height: "100%",
   });
 
   const fetchSearchResult = async (input) => {
@@ -54,26 +57,6 @@ const MapComponent = () => {
     setRouteData(geojson);
   };
 
-  const paintRoute = () => {
-    const routeLayer = {
-      id: "route",
-      type: "line",
-      source: {
-        type: "geojson",
-        data: routeData,
-      },
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-color": "#3887be",
-        "line-width": 5,
-        "line-opacity": 0.75,
-      },
-    };
-  };
-
   useEffect(() => {
     fetchSearchResult("starting");
   }, [state.startValue]);
@@ -92,6 +75,24 @@ const MapComponent = () => {
     console.log(routeData);
   }, [routeData]);
 
+console.log(routeData);
+
+  const StartMarkerProps = {
+    longitude: state.itinerary[0]?.[0]["coordinates"][0],
+    latitude: state.itinerary[0]?.[0]["coordinates"][1],
+  };
+
+  const markers =
+    state.itinerary.length > 0
+      ? state.itinerary.map((stop, index) => (
+          <Marker
+            longitude={stop[1]["coordinates"][0]}
+            latitude={stop[1]["coordinates"][1]}
+            key={index}
+          />
+        ))
+      : null;
+
   return (
     <Wrapper>
       <Map
@@ -99,21 +100,10 @@ const MapComponent = () => {
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxAccessToken={process.env.mapbox_key}
         {...viewstate}
-        width="100%"
-        height="100%"
         onMove={(evt) => setViewState(evt.viewState)}
       >
-        {marker2 ? (
-          <Marker latitude={marker2[1]} longitude={marker2[0]} />
-        ) : null}
-        {marker1 ? (
-          <Marker latitude={marker1[1]} longitude={marker1[0]} />
-        ) : null}
-        {routeData && (
-          <Source id="polylineLayer" type="geojson" data={routeData}>
-            <Layer type="line"/>
-          </Source>
-        )}
+        {state.itinerary.length > 0 && <Marker {...StartMarkerProps} />}
+        {markers}
       </Map>
     </Wrapper>
   );

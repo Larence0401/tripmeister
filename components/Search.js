@@ -11,12 +11,20 @@ const Search = () => {
   const [end, setEnd] = useState(null);
   const [date, setDate] = useState(new Date());
   const [focus, setFocus] = useState("");
+  const stopData =
+    state.itinerary.length === 0
+      ? [start, end, date]
+      : [
+          state.itinerary[state.itinerary.length - 1][1],
+          end,
+          date,
+        ];
 
   const handleSubmit = () => {
     if (!start || !end) return;
-    dispatch({ type: "createStage", payload: [start, end, date] });
-    setEnd(null)
-    dispatch({ type: "endValue", payload: "" })
+    dispatch({ type: "createStage", payload: stopData });
+    setEnd(null);
+    dispatch({ type: "endValue", payload: "" });
   };
 
   useEffect(() => {
@@ -30,7 +38,6 @@ const Search = () => {
 
   console.log(state.itinerary);
 
-
   return (
     <Wrapper>
       {state.itinerary.length === 0 ? (
@@ -43,7 +50,11 @@ const Search = () => {
           onFocus={() => setFocus("start")}
           onKeyDown={() => setStart(null)}
         />
-      ) : <LastStop>{state.itinerary[state.itinerary.length-1][1].place}</LastStop>}
+      ) : (
+        <LastStop>
+          {state.itinerary[state.itinerary.length - 1][1].place}
+        </LastStop>
+      )}
 
       {focus === "start" && state.startValue.length > 2 && !start && (
         <AutocompleteList setStart={setStart} />
