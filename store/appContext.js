@@ -12,7 +12,12 @@ export const ContextProvider = ({ children }) => {
         endValue: '',
         startSuggestion: [],
         endSuggestion: '',
-        itinerary: []
+        itinerary: [],
+        routeData: [],
+        mapView: true,
+        editView: false,
+        deleteView: false,
+        selectedStopData: []
     }
 
 const reducer = (state,action) => {
@@ -71,7 +76,43 @@ const reducer = (state,action) => {
                 itinerary: [...state.itinerary, action.payload]
             }
         }
-
+        case 'storeRouteData' : {
+            return {
+                ... state,
+                routeData: [...state.routeData, action.payload]
+            }
+        }
+        case 'setMapView' : {
+            return {
+                ... state,
+                mapView: action.payload
+            }
+        }
+        case 'setEditView' : {
+            return {
+                ... state,
+                editView: action.payload
+            }
+        }
+        case 'setDeleteView' : {
+            return {
+                ... state,
+                deleteView: action.payload
+            }
+        }
+        case 'selectStop' : {
+            return {
+                ... state,
+                selectedStopData: action.payload
+            }
+        }
+        case 'removeStop' : {
+            return {
+                ... state,
+                itinerary: action.payload['newItinerary'],
+                routeData: action.payload['newRoute']
+            }
+        }
         default: return state
     }
 }

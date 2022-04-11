@@ -5,6 +5,8 @@ import Sidebar from '../components/Sidebar'
 import Main from '../components/Main'
 import Search from '../components/Search'
 import dynamic from 'next/dynamic'
+import Itinerary from '../components/Itinerary'
+import { useAppContext } from "../store/appContext";
 
 const MapComponent = dynamic(() => import("../components/Map"), {
   loading: () => "Loading...",
@@ -13,6 +15,9 @@ const MapComponent = dynamic(() => import("../components/Map"), {
 
 
 export default function Home() {
+
+  const { state, dispatch } = useAppContext();
+
   return (
     <Wrapper>
       <Head>
@@ -25,7 +30,8 @@ export default function Home() {
       <Sidebar/>
       <Main>
         <Search/>
-        <MapComponent/>
+        {state.mapView ? <MapComponent/> : <Itinerary/>}
+        
       </Main>
     </Wrapper>
   )

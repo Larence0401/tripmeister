@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useAppContext } from "../store/appContext";
 import AutocompleteList from "./AutocompleteList";
+import {format} from "date-fns"
 
 const Search = () => {
   const { dispatch, state } = useAppContext();
@@ -36,7 +37,6 @@ const Search = () => {
     }
   }, [start, end]);
 
-  console.log(state.itinerary);
 
   return (
     <Wrapper>
@@ -51,7 +51,7 @@ const Search = () => {
           onKeyDown={() => setStart(null)}
         />
       ) : (
-        <LastStop>
+        <LastStop className="truncate">
           {state.itinerary[state.itinerary.length - 1][1].place}
         </LastStop>
       )}
