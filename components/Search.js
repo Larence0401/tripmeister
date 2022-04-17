@@ -4,7 +4,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useAppContext } from "../store/appContext";
 import AutocompleteList from "./AutocompleteList";
-import {format} from "date-fns"
+import getStartingLocation from "../utils/getStartingLocation";
+import getEndLocation from "../utils/getEndLocation";
+import getRoute from "../utils/getRoute";
 
 const Search = () => {
   const { dispatch, state } = useAppContext();
@@ -12,21 +14,108 @@ const Search = () => {
   const [end, setEnd] = useState(null);
   const [date, setDate] = useState(new Date());
   const [focus, setFocus] = useState("");
+  const [count, setCount] = useState(0);
+  const [isUpdated, setIsUpdated] = useState({ start: false, end: false });
+  const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const stopData =
     state.itinerary.length === 0
       ? [start, end, date]
-      : [
-          state.itinerary[state.itinerary.length - 1][1],
-          end,
-          date,
-        ];
+      : [state.itinerary[state.itinerary.length - 1][1], end, date];
+
+  const updatedStart = start ? start : state.selectedStopData[0];
+  const updatedEnd = end ? end : state.selectedStopData[1];
+  const updatedDate = date ? date : state.selectedStopData[2];
+  const updatedStopData = [updatedStart, updatedEnd, updatedDate];
+
+  const startValue =
+    state?.editView && !focus
+      ? getStartingLocation(state?.selectedStopData)
+      : start
+      ? start?.place
+      : state?.startValue;
+
+  const endValue =
+    state?.editView && !focus
+      ? getEndLocation(state?.selectedStopData)
+      : end
+      ? end?.place
+      : state?.endValue;
+
+  const buttonText = state.editView ? "update stop" : "add stop";
 
   const handleSubmit = () => {
-    if (!start || !end) return;
-    dispatch({ type: "createStage", payload: stopData });
-    setEnd(null);
+    if ((!start && !state.selectedStopData) || !end) return;
+    console.log("click")
+    if (!state.editView) {
+      dispatch({ type: "createStage", payload: stopData });
+      setEnd(null)
+    } 
+    if (state.editView) 
+    {
+      setUpdateSubmitted(true);};
     dispatch({ type: "endValue", payload: "" });
   };
+
+  const updateItinerary = () => {
+    const index = state?.selectedStopData?.[3]?.["index"];
+    if (!state.selectedStopData) return;
+    let arr = updateCurrentStop(index);
+    if (index > 0 && state.itinerary.length > 0) {
+      const newPrevStop = updateLastStop(index);
+      arr.splice(index - 1, 1, newPrevStop);
+    }
+    if (index < state.itinerary.length - 1) {
+      const newNextStop = updateNextStop(index);
+      arr.splice(index + 1, 1, newNextStop);
+    }
+    dispatch({ type: "updateItinerary", payload: arr });
+  };
+
+  const updateLastStop = (index) => {
+    const newPrevEnd = updatedStopData[0];
+    let prevStop = state.itinerary[index - 1];
+    prevStop.splice(1, 1, newPrevEnd);
+    return prevStop;
+  };
+
+  const updateNextStop = (index) => {
+    const newNextStart = updatedStopData[1];
+    let nextStop = state.itinerary[index + 1];
+    nextStop.splice(0, 1, newNextStart);
+    return nextStop;
+  };
+
+  const updateCurrentStop = (index) => {
+    let arr = [...state.itinerary];
+    arr.splice(index, 1, updatedStopData);
+    return arr;
+  };
+
+  const fetchSearchResult = async (input) => {
+    const location = input === "starting" ? state.startValue : state.endValue;
+    if (location.length < 2) return;
+    const response = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=${process.env.mapbox_key}&autocomplete=true`
+    );
+    const results = await response.json();
+    if (!results) return;
+    dispatch({ type: `${input}PointSuggestion`, payload: results.features });
+  };
+
+  const recalculateRoute = async() => {
+          const result = state.itinerary.map(async(el) => {
+            const startCoords = el[0]["coordinates"]
+            const endCoords = el[1]["coordinates"]
+            const coords = await getRoute(startCoords, endCoords)
+            return [coords]
+          })
+          const newRoute = await Promise.all(result)
+          console.log(newRoute)
+          dispatch({type: 'updateRouteData', payload: newRoute})
+  }
+
+
+  console.log(state.routeData)
 
   useEffect(() => {
     if (start) {
@@ -35,15 +124,44 @@ const Search = () => {
     if (end) {
       dispatch({ type: "resetEndSuggestions" });
     }
-  }, [start, end]);
+    if (updateSubmitted && (start || end) && state.editView) {
+      console.log("update successful")
+      updateItinerary();
+      setStart(null)
+      setEnd(null)
+    }
+  }, [start, end, updateSubmitted]);
 
+  useEffect(() => setFocus(""), [state.selectedStopData]);
+
+  useEffect(() => {
+    if(!state.editView) return
+    setCount(count => count++)
+    console.log(count)
+    recalculateRoute()
+  },[state.itinerary])
+
+  useEffect(() => {
+    fetchSearchResult("starting");
+  }, [state.startValue]);
+
+  useEffect(() => {
+    fetchSearchResult("end");
+  }, [state.endValue]);
+
+  useEffect(() => {
+    if (state.editView) {
+      setStart(null);
+      setEnd(null);
+    }
+  }, [state.editView]);
 
   return (
     <Wrapper>
-      {state.itinerary.length === 0 ? (
+      {state.itinerary.length === 0 || state.editView ? (
         <DestinationInput
           placeholder="starting point"
-          value={start ? start.place : state.startValue}
+          value={startValue}
           onChange={(e) =>
             dispatch({ type: "startValue", payload: e.target.value })
           }
@@ -52,7 +170,7 @@ const Search = () => {
         />
       ) : (
         <LastStop className="truncate">
-          {state.itinerary[state.itinerary.length - 1][1].place}
+          {state?.itinerary?.[state.itinerary.length - 1]?.[1]?.place}
         </LastStop>
       )}
 
@@ -61,7 +179,7 @@ const Search = () => {
       )}
       <DestinationInput
         placeholder="destination point"
-        value={end ? end.place : state.endValue}
+        value={endValue}
         onChange={(e) =>
           dispatch({ type: "endValue", payload: e.target.value })
         }
@@ -76,9 +194,10 @@ const Search = () => {
           selected={date}
           onChange={(date) => setDate(date)}
           showTimeSelect
+          dateFormat="dd.MM.yyyy"
         />
       </DatePickerContainer>
-      <AddStopButton onClick={handleSubmit}>Add Stop</AddStopButton>
+      <AddStopButton onClick={handleSubmit}>{buttonText}</AddStopButton>
     </Wrapper>
   );
 };

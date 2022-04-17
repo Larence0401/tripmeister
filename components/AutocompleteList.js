@@ -6,14 +6,17 @@ const AutocompleteList = ({ setStart, setEnd }) => {
   const { state } = useAppContext();
   const [val, setVal] = useState(null);
   const suggestions = setStart ? "startSuggestion" : "endSuggestion";
+  const marginLeft = state.selectedStopData ? "" : "mx-8"
   console.log(suggestions);
+  console.log(state.startSuggestion)
+  console.log(state.endSuggestion)
 
   useEffect(() => {
     setStart ? setStart(val) : setEnd(val);
   }, [val]);
 
   return (
-    <Wrapper>
+    <Wrapper className={marginLeft}>
       <ul>
       {state[`${suggestions}`].map((el, index) => (
           <ListItem
@@ -39,7 +42,6 @@ export default AutocompleteList;
 const Wrapper = tw.div`
 px-2
 py-1
-mx-8
 mb-4
 w-full
 truncate

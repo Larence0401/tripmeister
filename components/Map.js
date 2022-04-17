@@ -6,10 +6,10 @@ import ZoomInMapIcon from "@mui/icons-material/ZoomInMap";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import MapIcon from "@mui/icons-material/Map";
+//import getRoute from "../utils/getRoute"
 
 const MapComponent = () => {
   const { state, dispatch } = useAppContext();
-  const [routeData, setRouteData] = useState("");
   const [zoomedOut, setZoomedOut] = useState(false);
   const [isListView, setIsListView] = useState(false);
   const mapRef = useRef();
@@ -24,6 +24,9 @@ const MapComponent = () => {
       ? state.itinerary[state.itinerary.length - 1][0]["coordinates"]
       : null;
 
+console.log(state.routeData)
+console.log(state.routeData.length)
+
   const [viewstate, setViewState] = useState({
     latitude: "52.5200",
     longitude: "13.4050",
@@ -31,18 +34,6 @@ const MapComponent = () => {
     width: "100%",
     height: "100%",
   });
-
-  const fetchSearchResult = async (input) => {
-    const location = input === "starting" ? state.startValue : state.endValue;
-
-    if (state.startValue.length < 2) return;
-    const response = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=${process.env.mapbox_key}&autocomplete=true`
-    );
-    const results = await response.json();
-    if (!results) return;
-    dispatch({ type: `${input}PointSuggestion`, payload: results.features });
-  };
 
   const getRoute = async () => {
     const query = await fetch(
@@ -60,9 +51,11 @@ const MapComponent = () => {
         coordinates: route,
       },
     };
-    setRouteData(geojson);
+    //setRouteData(geojson);
     dispatch({ type: "storeRouteData", payload: [geojson] });
   };
+
+
 
   const getCoordinates = (type) => {
     if (state.itinerary.length < 1) return;
@@ -95,17 +88,10 @@ const MapComponent = () => {
     return fitBounds;
   };
 
-  useEffect(() => {
-    fetchSearchResult("starting");
-  }, [state.startValue]);
-
-  useEffect(() => {
-    fetchSearchResult("end");
-  }, [state.endValue]);
 
   useEffect(() => {
     if (state.itinerary.length === 0) return;
-    getRoute();
+    getRoute()
     const fitBounds =
       zoomedOut && state.itinerary.length > 0
         ? getFitBounds()
@@ -142,10 +128,6 @@ const MapComponent = () => {
           </Source>
         ))
       : null;
-
-      console.log(state.routeData)
-      console.log(state.itinerary?.[0]?.[2])
-
 
   return (
     <Wrapper>

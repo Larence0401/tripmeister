@@ -5,30 +5,35 @@ import { useAppContext } from "../store/appContext";
 import ItineraryItem from "./ItineraryItem";
 import EditStop from "./EditStop";
 import DeleteStop from "./DeleteStop";
+import AddIcon from "@mui/icons-material/Add";
 
 const Itinerary = () => {
   const { state, dispatch } = useAppContext();
   const [listItem, setListItem] = useState("");
 
-  console.log(listItem);
- console.log(state.editView)
- console.log(state.deleteView)
-  console.log(state.itinerary);
   return (
     <Wrapper>
+      {state.editView && (
+        <AddStop onClick={()=> dispatch({type: 'setEditView', payload: false})}>
+          add new stop
+          <AddIcon className="ml-2" />
+        </AddStop>
+      )}
       <MapIcon
         className="absolute right-0 mr-4 text-slate-900"
         fontSize="large"
         onClick={() => dispatch({ type: "setMapView", payload: true })}
       />
-      {state.editView ? (
-        <EditStop listItem={listItem} />
-      ) : state.deleteView ? (
+      {state.deleteView ? (
         <DeleteStop listItem={listItem} />
       ) : (
         <ListContainer>
-          {state.itinerary.map((item,index) => (
-            <ItineraryItem item={item} index={index} setListItem={setListItem} />
+          {state.itinerary.map((item, index) => (
+            <ItineraryItem
+              item={item}
+              index={index}
+              setListItem={setListItem}
+            />
           ))}
         </ListContainer>
       )}
@@ -52,3 +57,16 @@ const Wrapper = tw.div`
 const ListContainer = tw.div`
     w-full
     mt-12`;
+
+const AddStop = tw.div`
+    uppercase
+    py-1
+    px-3
+    text-slate-900
+    border
+    rounded-sm
+    border-slate-900
+    rounded
+    ml-8
+    absolute
+    left-0`;
