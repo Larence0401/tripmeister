@@ -8,19 +8,21 @@ import getStartingLocation from "../utils/getStartingLocation";
 import getEndLocation from "../utils/getEndLocation";
 import getRoute from "../utils/getRoute";
 
+
 const Search = () => {
   const { dispatch, state } = useAppContext();
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [date, setDate] = useState(new Date());
+  const accommodation = {accommodation: ""}
+  const activities = {activities: []}
   const [focus, setFocus] = useState("");
-  const [count, setCount] = useState(0);
   const [isUpdated, setIsUpdated] = useState({ start: false, end: false });
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const stopData =
     state.itinerary.length === 0
-      ? [start, end, date]
-      : [state.itinerary[state.itinerary.length - 1][1], end, date];
+      ? [start, end, date, accommodation, activities]
+      : [state.itinerary[state.itinerary.length - 1][1], end, date, accommodation, activities];
 
   const updatedStart = start ? start : state.selectedStopData[0];
   const updatedEnd = end ? end : state.selectedStopData[1];
@@ -28,14 +30,14 @@ const Search = () => {
   const updatedStopData = [updatedStart, updatedEnd, updatedDate];
 
   const startValue =
-    state?.editView && !focus
+    state?.editView && focus !=="start" && !start
       ? getStartingLocation(state?.selectedStopData)
       : start
       ? start?.place
       : state?.startValue;
 
   const endValue =
-    state?.editView && !focus
+    state?.editView && focus !== "end"
       ? getEndLocation(state?.selectedStopData)
       : end
       ? end?.place
@@ -110,7 +112,6 @@ const Search = () => {
             return [coords]
           })
           const newRoute = await Promise.all(result)
-          console.log(newRoute)
           dispatch({type: 'updateRouteData', payload: newRoute})
   }
 
@@ -125,7 +126,6 @@ const Search = () => {
       dispatch({ type: "resetEndSuggestions" });
     }
     if (updateSubmitted && (start || end) && state.editView) {
-      console.log("update successful")
       updateItinerary();
       setStart(null)
       setEnd(null)
@@ -135,10 +135,7 @@ const Search = () => {
   useEffect(() => setFocus(""), [state.selectedStopData]);
 
   useEffect(() => {
-    if(!state.editView) return
-    setCount(count => count++)
-    console.log(count)
-    recalculateRoute()
+      recalculateRoute()
   },[state.itinerary])
 
   useEffect(() => {
@@ -213,6 +210,7 @@ const Wrapper = tw.div`
     items-center
     bg-white
     m-8
+    mb-4
     p-8
     h-auto
     w-full`;

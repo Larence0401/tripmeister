@@ -3,7 +3,6 @@ import tw from "tailwind-styled-components";
 import MapIcon from "@mui/icons-material/Map";
 import { useAppContext } from "../store/appContext";
 import ItineraryItem from "./ItineraryItem";
-import EditStop from "./EditStop";
 import DeleteStop from "./DeleteStop";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -11,16 +10,21 @@ const Itinerary = () => {
   const { state, dispatch } = useAppContext();
   const [listItem, setListItem] = useState("");
 
+  const handleClick = () => {
+    dispatch({type: 'setEditView', payload: false})
+    dispatch({type: 'setEditViewType', payload: "directions"})
+  }
+
   return (
     <Wrapper>
-      {state.editView && (
-        <AddStop onClick={()=> dispatch({type: 'setEditView', payload: false})}>
+      {state.editView && !state.deleteView && (
+        <AddStop onClick={()=> handleClick()}>
           add new stop
           <AddIcon className="ml-2" />
         </AddStop>
       )}
       <MapIcon
-        className="absolute right-0 mr-4 text-slate-900"
+        className="absolute right-0 mr-8 text-slate-900"
         fontSize="large"
         onClick={() => dispatch({ type: "setMapView", payload: true })}
       />
@@ -47,7 +51,7 @@ const Wrapper = tw.div`
     bg-white
     relative
     p-8
-    pt-4
+    mt-4
     flex
     flex-col
     items-center
@@ -55,6 +59,7 @@ const Wrapper = tw.div`
     h-full`;
 
 const ListContainer = tw.div`
+    mt-4
     w-full
     mt-12`;
 
@@ -69,4 +74,6 @@ const AddStop = tw.div`
     rounded
     ml-8
     absolute
+    flex
+    items-center
     left-0`;

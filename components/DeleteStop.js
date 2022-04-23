@@ -5,38 +5,29 @@ import tw from "tailwind-styled-components";
 import getFormattedDate from "../utils/getFormattedDate";
 import getEndLocation from "../utils/getEndLocation";
 import getStartingLocation from "../utils/getStartingLocation";
+import useRecalculateRoute from "../hooks/useRecalculateRoute";
 import getRoute from "../utils/getRoute";
 
 const DeleteStop = () => {
   const { state, dispatch } = useAppContext();
+  console.log(state.selectedStopData)
   const [deleted, setIsDeleted] = useState(false);
-  const [startCoords, setStartCoords] = useState(null);
-  const [endCoords, setEndCoords] = useState(null);
-  const [numberOfSections, setNumberOfSections] = useState(0);
   const date = getFormattedDate(state.selectedStopData);
   const end = getEndLocation(state.selectedStopData);
   const start = getStartingLocation(state.selectedStopData);
   const stageDetails = deleted ? "line-through text-gray-600" : "";
-  const index = state.selectedStopData[3]["index"];
+  const index = state.selectedStopData[5]["index"];
   const isLastStop = index === state.itinerary.length - 1;
+  const route = useRecalculateRoute()
 
   const deleteStop = () => {
+    console.log(index)
     setIsDeleted(true);
-    setNumberOfSections(state.itinerary.length);
-    if (!isLastStop && index !== 0) getEndPointCoordinates();
     let newItinerary = [...state.itinerary];
     newItinerary.splice(index, 1);
-    let newRoute = [...state.routeData];
-    if(isLastStop) {
-      newRoute.splice(index - 1, 1)
-    } else if(index === 0) {
-      newRoute.splice(0, 1)
-    } else {newRoute.splice(index - 1, 2)}
     if (!isLastStop && index !== 0) patchRoute();
-    dispatch({
-      type: "removeStop",
-      payload: { newItinerary, newRoute },
-    });
+    console.log(newItinerary)
+    dispatch({ type: "updateItinerary", payload: newItinerary });
   };
 
   const patchRoute = () => {
@@ -48,31 +39,34 @@ const DeleteStop = () => {
     dispatch({ type: "patchRoute", payload: newItinerary });
   };
 
-  const getEndPointCoordinates = () => {
-    setStartCoords(state.itinerary[index - 1][0]["coordinates"]);
-    setEndCoords(state.itinerary[index + 1][0]["coordinates"]);
-  };
+  const recalculateRoute = async() => {
+    const result = state.itinerary.map(async(el) => {
+      const startCoords = el[0]["coordinates"]
+      const endCoords = el[1]["coordinates"]
+      const coords = await getRoute(startCoords, endCoords)
+      return [coords]
+    })
+    const newRoute = await Promise.all(result)
+    dispatch({type: 'updateRouteData', payload: newRoute})
+}
 
-  const updateRoute = async () => {
-    if (!startCoords || !endCoords) return;
-    const geojson = await getRoute(startCoords, endCoords);
-    const newArr = [...state.routeData];
-    newArr.splice(index - 1, 0, [geojson]);
-    dispatch({ type: "recalculateRoute", payload: newArr });
-    dispatch({ type: "updateRoute" });
-  };
+const handleClick = () => {
+  dispatch({ type: "setDeleteView", payload: false })
+  dispatch({type: 'setEditView', payload: 'directions'})
+}
 
-  useEffect( () => {
-    if (index === numberOfSections - 1) return;
-    updateRoute();
-  }, [startCoords, endCoords]);
+
+
+  useEffect(() => {
+    getRoute()
+  }, [state.itinerary]);
 
   return (
     <Wrapper>
       <ArrowBackIcon
         className="self-start mb-4"
         fontSize="large"
-        onClick={() => dispatch({ type: "setDeleteView", payload: false })}
+        onClick={() => handleClick()}
       />
       <StageDetails
         className={stageDetails}

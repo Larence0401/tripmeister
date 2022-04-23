@@ -21,7 +21,8 @@ export const ContextProvider = ({ children }) => {
     routeUpdate: 0,
     startingPoint: null,
     endPoint: null,
-    editStop: false
+    editStop: false, 
+    editViewType: "directions"
   };
 
   const reducer = (state, action) => {
@@ -169,6 +170,12 @@ export const ContextProvider = ({ children }) => {
         return {
           ...state,
           editStop: true
+        };
+      }
+      case "setEditViewType": {
+        return {
+          ...state,
+          editViewType: action.payload
         };
       }
       default:

@@ -24,8 +24,6 @@ const MapComponent = () => {
       ? state.itinerary[state.itinerary.length - 1][0]["coordinates"]
       : null;
 
-console.log(state.routeData)
-console.log(state.routeData.length)
 
   const [viewstate, setViewState] = useState({
     latitude: "52.5200",
@@ -180,4 +178,5 @@ const Wrapper = tw.div`
     relative
     w-full
     h-full
+    mt-4
     mx-8`;

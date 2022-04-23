@@ -10,11 +10,9 @@ const ItineraryItem = ({ item, index}) => {
   const startingpoint = item[0].place.split(",")[0];
   const destinationpoint = item[1].place.split(",")[0];
   const formattedTime = format(item[2], "dd MMM");
-  //const selectedStyle = state?.selectedStopData['index'] === index ? "italic font-bold" : ""
   //const [selectedStyle, setSelectedStyle] = useState("")
-  console.log(state?.selectedStopData['index'])
-  console.log(index)
-  const selectedStyle = state?.selectedStopData?.[3]?.['index'] === index && state.editView ? "italic font-semibold bg-[rgb(247,247,247)]" : ""
+  const selectedStyle = state?.selectedStopData?.[5]?.['index'] === index && state.editView ? "italic font-semibold bg-[rgb(247,247,247)]" : ""
+
 
   const handleClick = action => {
     console.log(item)
@@ -59,6 +57,7 @@ const Wrapper = tw.div`
     border-b
     border-slate-300
     py-4
+    px-2
     flex
     w-full
 `;

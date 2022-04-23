@@ -2,6 +2,7 @@ import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import { useState, useEffect } from "react";
 
+
 const AutocompleteList = ({ setStart, setEnd }) => {
   const { state } = useAppContext();
   const [val, setVal] = useState(null);
