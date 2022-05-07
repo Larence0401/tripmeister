@@ -3,82 +3,61 @@ import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
-import HotelIcon from "@mui/icons-material/Hotel";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckIcon from "@mui/icons-material/Check";
-import EditIcon from "@mui/icons-material/Edit";
-import CloseIcon from '@mui/icons-material/Close';
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import ActivityList from "./ActivityList"
+import ActivityList from "./ActivityList";
+import Activities from "./Activities"
+import getStartingLocation from "../utils/getStartingLocation";
+import getEndLocation from "../utils/getEndLocation";
+import TimeField from "react-simple-timefield";
 
 const EditNotes = () => {
-  const [accommodation, setAccommodation] = useState("");
-  const [accIsSet, setAccIsSet] = useState(false);
   const [activityInput, setActivityInput] = useState(false);
   const [activity, setActivity] = useState("");
-  const [listItem, setListItem] = useState("");
+  const [showLocationSelect, setShowLocationSelect] = useState(false);
+  const [timeSelect, setTimeSelect] = useState(null);
+  const [showTimeField, setShowTimeField] = useState(false);
+  const [time, setTime] = useState("12:00");
+  const [location, setLocation] = useState("");
   const { state, dispatch } = useAppContext();
-
-  const checkIcon_acc =
-    accommodation === "" ? (
+  const start = getStartingLocation(state.selectedStopData);
+  const end = getEndLocation(state.selectedStopData);
+  const checkIcon_act =
+    activity === "" ? (
       ""
     ) : (
-      <CheckIcon onClick={() => submitAccommodation()} />
+      // <CheckIcon onClick={() => submitActivity(activity)} />
+      <CheckIcon onClick={() => setShowLocationSelect(true)} />
     );
 
-  const checkIcon_act =
-    activity === "" ? "" : <CheckIcon onClick={() => submitActivity(activity)} />;
-
-  const submitActivity = (activity) => {
+  const submitActivity = () => {
+    setTimeSelect(false)
     setActivityInput(false);
     const arr = [...state.itinerary];
-    const index = state.selectedStopData[5]["index"];
-    arr[index][4]["activities"].push(activity);
+    const index = state.selectedStopData[6]["index"];
+    const timeVal = showTimeField ? time : null;
+    const activityObject = { activity, location, timeVal };
+    arr[index][4]["activities"].push(activityObject);
     dispatch({ type: "updateItinerary", payload: arr });
   };
 
-  const submitAccommodation = () => {
-    setAccIsSet(true);
-    const arr = [...state.itinerary];
-    const index = state.selectedStopData[5]["index"];
-    arr[index][3]["accommodation"] = accommodation;
-    dispatch({ type: "updateItinerary", payload: arr });
+  const handleClick = (location) => {
+    setLocation(location);
+    setShowLocationSelect(false);
+    setTimeSelect(true);
+    setShowTimeField(false)
   };
+
+
 
   console.log(state.itinerary);
 
   return (
     <Wrapper>
-      {!accIsSet ? (
-        <TextField
-          placeholder="add accommodation"
-          size="small"
-          onKeyUp={(e) => setAccommodation(e.target.value)}
-          className="uppercase w-full"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <HotelIcon />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">{checkIcon_acc}</InputAdornment>
-            ),
-          }}
-        />
-      ) : (
-        <Accommodation>
-          <HotelIcon className="mr-8" />
-          {accommodation}
-          <EditIcon
-            className="justify-self-end ml-4 text-slate-700 hover:text-slate-900"
-            fontSize="small"
-            onClick={() => setAccIsSet(false)}
-          />
-        </Accommodation>
-      )}
       <ActivityContainer>
-        <ActivityList/>
+        {/* <ActivityList /> */}
+        <Activities/>
         {!activityInput && (
           <AddActivity>
             add activity{" "}
@@ -88,10 +67,10 @@ const EditNotes = () => {
             />
           </AddActivity>
         )}
-        {activityInput && (
+        {activityInput && !showLocationSelect && !timeSelect && (
           <TextField
-          className="p-2"
-          size="small"
+            className="p-2"
+            size="small"
             placeholder="add activity"
             onKeyUp={(e) => setActivity(e.target.value)}
             InputProps={{
@@ -105,6 +84,38 @@ const EditNotes = () => {
               ),
             }}
           />
+        )}
+        {showLocationSelect && (
+          <>
+            <p className="pl-2">assign activity to ...</p>
+            <LocationSelect>
+              <Button onClick={() => handleClick(start)}>{start}</Button>
+              <span>OR</span>
+              <Button onClick={() => handleClick(end)}>{end}</Button>
+            </LocationSelect>
+          </>
+        )}
+        {timeSelect && (
+          <div className="flex flex-col">
+            <TimeContainer>
+              <p className="mr-4 text-lg">assign time to activity?</p>
+              <input
+                type="checkbox"
+                className="mr-4 scale-150"
+                onChange={() => setShowTimeField(prev => !prev)}
+              />
+              {showTimeField && (
+                <TimeField
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                />
+              )}
+            </TimeContainer>
+            <AddActivity onClick={() => submitActivity()}>
+              Add to list
+              <AddCircleIcon className="ml-2" />
+            </AddActivity>
+          </div>
         )}
       </ActivityContainer>
     </Wrapper>
@@ -122,17 +133,10 @@ const Wrapper = tw.div`
     items-start
     bg-white
     m-8
+    mx-0
     mb-4
     p-8
     h-auto
-    w-full`;
-
-const Accommodation = tw.div`
-    flex
-    justify-start
-    items-center
-    uppercase
-    px-2
     w-full`;
 
 const AddActivity = tw.div`
@@ -148,14 +152,34 @@ const AddActivity = tw.div`
     flex
     items-center
     justify-center
-    mt-4
     text-center
 `;
 
 const ActivityContainer = tw.div`
-  mt-8
-  pt-4
-  border-t
-  border-slate-300
-  w-full
+    w-full
+`;
+
+const LocationSelect = tw.div`
+w-full
+flex
+items-center
+`;
+const Button = tw.div`
+w-1/2
+m-2
+p-2
+py-1
+border
+border-slate-600
+rounded-md
+text-center
+uppercase
+`;
+
+const TimeContainer = tw.div`
+w-full
+flex
+items-center
+p-2
+mb-2
 `;

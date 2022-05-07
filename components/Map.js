@@ -14,6 +14,7 @@ const MapComponent = () => {
   const [isListView, setIsListView] = useState(false);
   const mapRef = useRef();
 
+
   const marker2 =
     state.itinerary?.length > 0
       ? state.itinerary[state.itinerary.length - 1][1]["coordinates"]
@@ -53,7 +54,7 @@ const MapComponent = () => {
     dispatch({ type: "storeRouteData", payload: [geojson] });
   };
 
-
+  const getMarkerColor = (stop) => stop?.[5]?.stayOvernight ? "bg-green-300" : ""
 
   const getCoordinates = (type) => {
     if (state.itinerary.length < 1) return;
@@ -90,14 +91,16 @@ const MapComponent = () => {
   useEffect(() => {
     if (state.itinerary.length === 0) return;
     getRoute()
+
     const fitBounds =
       zoomedOut && state.itinerary.length > 0
         ? getFitBounds()
         : [marker1, marker2];
-    mapRef.current?.fitBounds(fitBounds, { padding: 60 });
+    mapRef.current?.fitBounds(fitBounds, { padding: 60});
   }, [state.itinerary, zoomedOut]);
 
   const StartMarkerProps = {
+    color: '#000000',
     longitude: state.itinerary[0]?.[0]["coordinates"][0],
     latitude: state.itinerary[0]?.[0]["coordinates"][1],
   };
@@ -106,6 +109,7 @@ const MapComponent = () => {
     state.itinerary.length > 0
       ? state.itinerary.map((stop, index) => (
           <Marker
+            color={getMarkerColor(stop)}
             longitude={stop[1]["coordinates"][0]}
             latitude={stop[1]["coordinates"][1]}
             key={index}
@@ -127,6 +131,7 @@ const MapComponent = () => {
         ))
       : null;
 
+
   return (
     <Wrapper>
       <Map
@@ -139,23 +144,25 @@ const MapComponent = () => {
       >
         {zoomedOut ? (
           <ZoomInMapIcon
-            className="absolute m-4 z-90 text-slate-900 rounded-md"
+            className="absolute m-4 lg:m-8 z-90 text-slate-900 rounded-md lg:right-0"
             fontSize="large"
             onClick={() => setZoomedOut(false)}
           />
         ) : (
           <ZoomOutMapIcon
-            className="absolute m-4 z-90 bg-white/[.06] rounded-md"
+            className="absolute m-4 lg:m-8 z-90 bg-white/[.06] rounded-md lg:right-0"
             fontSize="large"
             onClick={() => setZoomedOut(true)}
           />
         )}
         {!isListView ? (
+          <div className="lg:hidden">
           <ViewListIcon
             className="absolute right-0 m-4 text-slate-900"
             fontSize="large"
             onClick={() => dispatch({type: 'setMapView', payload: false})}
           />
+          </div>
         ) : (
           <MapIcon
             className="absolute right-0 m-4 text-slate-900"
@@ -179,4 +186,7 @@ const Wrapper = tw.div`
     w-full
     h-full
     mt-4
-    mx-8`;
+    lg:mt-0
+    mx-8
+    lg:mx-0
+    `;

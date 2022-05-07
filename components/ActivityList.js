@@ -6,19 +6,23 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import CheckIcon from "@mui/icons-material/Check";
+import getStartingLocation from "../utils/getStartingLocation";
+import getEndLocation from "../utils/getEndLocation";
 
-const ActivityList = () => {
+const ActivityList = ({activities}) => {
+console.log(activities)
+
   const { state, dispatch } = useAppContext();
   const [isSelected, setIsSelected] = useState(null);
   const [toBeDeleted, setToBeDeleted] = useState(false);
   const [value, setValue] = useState(null);
   const index = state.selectedStopData[5]["index"];
-  const activities = state.itinerary[index][4]["activities"];
   const arr = [...state.itinerary]
   const subIndex = isSelected
   const checkIcon_act =
   value === "" ? "" : <CheckIcon onClick={() => updateActivity()} />;
   const listItemStyle = toBeDeleted ? "line-through text-slate-700" : ""
+
 
   const updateActivity = () => {
     setIsSelected(null)
@@ -49,7 +53,9 @@ const ActivityList = () => {
       ? activities.map((el, i) =>
           isSelected !== i ? (
             <ListItem className={listItemStyle}>
-              {`- ${el}`}
+              <Activity>{`- ${el.activity}`}</Activity>
+              <Time>{el.timeVal}</Time>
+              
               <div>
                 <EditIcon
                   fontSize="small"
@@ -103,6 +109,11 @@ const TextFieldContainer = tw.div`
 
  `;
 
-const Activity = tw.p`
+const Time = tw.div`
+w-2/12
+ `;
 
+ const Activity = tw.div`
+w-6/12
+truncate
  `;

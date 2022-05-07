@@ -7,30 +7,53 @@ import AutocompleteList from "./AutocompleteList";
 import getStartingLocation from "../utils/getStartingLocation";
 import getEndLocation from "../utils/getEndLocation";
 import getRoute from "../utils/getRoute";
+import ToggleOffIcon from "@mui/icons-material/ToggleOff";
+import ToggleOnIcon from "@mui/icons-material/ToggleOn";
+import HotelIcon from "@mui/icons-material/Hotel";
 
 
 const Search = () => {
   const { dispatch, state } = useAppContext();
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
-  const [date, setDate] = useState(new Date());
-  const accommodation = {accommodation: ""}
-  const activities = {activities: []}
+  const [newDate, setNewDate] = useState(new Date());
+  const [datePlus, setDatePlus] = useState(new Date());
+  const accommodation = state.itinerary?.[3]?.id ? state.itinerary?.[3] : { accommodation_test: "" }
+  const activities = { activities: [] };
   const [focus, setFocus] = useState("");
+  const [stayOvernight, setStayOvernight] = useState({ stayOvernight: true });
   const [isUpdated, setIsUpdated] = useState({ start: false, end: false });
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
+  const bedColor = stayOvernight.stayOvernight ? "text-blue-500" : "text-gray-500";
+  const dateInput = end ? "w-2/3" : "w-full";
   const stopData =
     state.itinerary.length === 0
-      ? [start, end, date, accommodation, activities]
-      : [state.itinerary[state.itinerary.length - 1][1], end, date, accommodation, activities];
+      ? [start, end, newDate, accommodation, activities, stayOvernight]
+      : [
+          state.itinerary[state.itinerary.length - 1][1],
+          end,
+          newDate,
+          accommodation,
+          activities,
+          stayOvernight,
+        ];
 
   const updatedStart = start ? start : state.selectedStopData[0];
   const updatedEnd = end ? end : state.selectedStopData[1];
-  const updatedDate = date ? date : state.selectedStopData[2];
+  const updatedDate = newDate ? newDate : state.selectedStopData[2];
   const updatedStopData = [updatedStart, updatedEnd, updatedDate];
+  const isStayOvernight = state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight
+
+  const slideIn = state.sidebarIsOpen
+  ? "translate-x-[250px] duration-300 ease-in-out"
+  : "-translate-x-0 duration-300 ease-in-out";
+
+
+
+
 
   const startValue =
-    state?.editView && focus !=="start" && !start
+    state?.editView && focus !== "start" && !start
       ? getStartingLocation(state?.selectedStopData)
       : start
       ? start?.place
@@ -45,21 +68,34 @@ const Search = () => {
 
   const buttonText = state.editView ? "update stop" : "add stop";
 
+  console.log(newDate)
+
   const handleSubmit = () => {
     if ((!start && !state.selectedStopData) || !end) return;
-    console.log("click")
+    console.log("click");
     if (!state.editView) {
       dispatch({ type: "createStage", payload: stopData });
-      setEnd(null)
-    } 
-    if (state.editView) 
-    {
-      setUpdateSubmitted(true);};
+      setEnd(null);
+    }
+    if (state.editView) {
+      setUpdateSubmitted(true);
+    }
     dispatch({ type: "endValue", payload: "" });
   };
 
+  // const addDay = () => {
+  //   let result = state.itinerary?.[state.itinerary?.length - 1]?.[2];
+  //   result.setDate(result.getDate() + 1);
+  //   setDatePlus(result)
+  // };
+
+  const getNewStartDate = () => {
+    const isStayOvernight = state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight
+    if(isStayOvernight) addDay()
+  }
+
   const updateItinerary = () => {
-    const index = state?.selectedStopData?.[3]?.["index"];
+    const index = state?.selectedStopData?.[5]?.["index"];
     if (!state.selectedStopData) return;
     let arr = updateCurrentStop(index);
     if (index > 0 && state.itinerary.length > 0) {
@@ -104,19 +140,20 @@ const Search = () => {
     dispatch({ type: `${input}PointSuggestion`, payload: results.features });
   };
 
-  const recalculateRoute = async() => {
-          const result = state.itinerary.map(async(el) => {
-            const startCoords = el[0]["coordinates"]
-            const endCoords = el[1]["coordinates"]
-            const coords = await getRoute(startCoords, endCoords)
-            return [coords]
-          })
-          const newRoute = await Promise.all(result)
-          dispatch({type: 'updateRouteData', payload: newRoute})
-  }
+  const recalculateRoute = async () => {
+    const result = state.itinerary.map(async (el) => {
+      const startCoords = el[0]["coordinates"];
+      const endCoords = el[1]["coordinates"];
+      const coords = await getRoute(startCoords, endCoords);
+      return [coords];
+    });
+    const newRoute = await Promise.all(result);
+    dispatch({ type: "updateRouteData", payload: newRoute });
+  };
 
 
-  console.log(state.routeData)
+  //console.log(date.setDate(date.getDate() + 1))
+  //if(state.itinerary.length > 0) console.log(addDay())
 
   useEffect(() => {
     if (start) {
@@ -127,16 +164,17 @@ const Search = () => {
     }
     if (updateSubmitted && (start || end) && state.editView) {
       updateItinerary();
-      setStart(null)
-      setEnd(null)
+      setStart(null);
+      setEnd(null);
     }
   }, [start, end, updateSubmitted]);
 
   useEffect(() => setFocus(""), [state.selectedStopData]);
 
   useEffect(() => {
-      recalculateRoute()
-  },[state.itinerary])
+    recalculateRoute();
+   // getNewStartDate()
+  }, [state.itinerary]);
 
   useEffect(() => {
     fetchSearchResult("starting");
@@ -153,8 +191,16 @@ const Search = () => {
     }
   }, [state.editView]);
 
+  useEffect(() => {
+    if(!isStayOvernight) return;
+    let dateOld = newDate.getTime()
+    const datePlus = dateOld + (3600 * 24 * 1000)
+    const date = new Date(datePlus)
+    setNewDate(date)
+  },[state.itinerary.length])
+
   return (
-    <Wrapper>
+    <Wrapper className={slideIn}>
       {state.itinerary.length === 0 || state.editView ? (
         <DestinationInput
           placeholder="starting point"
@@ -186,14 +232,40 @@ const Search = () => {
       {focus === "end" && state.endValue.length > 2 && !end && (
         <AutocompleteList setEnd={setEnd} />
       )}
-      <DatePickerContainer>
-        <DatePicker
-          selected={date}
-          onChange={(date) => setDate(date)}
-          showTimeSelect
-          dateFormat="dd.MM.yyyy"
-        />
-      </DatePickerContainer>
+      <div className="flex w-full items-center mb-8 justify-between">
+        <DatePickerContainer className={dateInput}>
+          <DatePicker
+            className="w-3/4"
+            selected={newDate}
+            onChange={(date) => setNewDate(date)}
+            showTimeSelect
+            dateFormat="dd.MM.yyyy"
+          />
+        </DatePickerContainer>
+        {stayOvernight.stayOvernight && end ? (
+          <ToggleOnIcon
+            fontSize="large"
+            className="text-blue-500"
+            onClick={() =>
+              setStayOvernight((prev) => {
+                return {stayOvernight: !prev.stayOvernight };
+              })
+            }
+          />
+        ) : !stayOvernight.stayOvernight && end ? (
+          <ToggleOffIcon
+            fontSize="large"
+            className="text-gray-500"
+            onClick={() =>
+              setStayOvernight((prev) => {
+                return {stayOvernight: !prev.stayOvernight };
+              })
+            }
+          />
+        ) : null}
+        {end && <HotelIcon fontSize="large" className={bedColor} />}
+      </div>
+
       <AddStopButton onClick={handleSubmit}>{buttonText}</AddStopButton>
     </Wrapper>
   );
@@ -210,9 +282,14 @@ const Wrapper = tw.div`
     items-center
     bg-white
     m-8
+    mx-0
+    lg:m-0
+    lg:mb-4
+    lg-mt-8
     mb-4
     p-8
     h-auto
+    lg:z-10
     w-full`;
 
 const DestinationInput = tw.input`
@@ -229,14 +306,16 @@ const DestinationInput = tw.input`
 
 const DatePickerContainer = tw.div`
     rounded-sm
+    flex
     border
     border-slate-300
+    self-start
     box-border
     leading-10
-    mb-8
     px-2
+    pr-2
     py-1
-    w-full`;
+`;
 
 const AddStopButton = tw.button`
     rounded-md
@@ -250,6 +329,7 @@ const AddStopButton = tw.button`
     text-2xl
     uppercase
     align-center
+  
     w-full`;
 
 const SuggestionsWrapper = tw.div`
@@ -279,6 +359,5 @@ uppercase
 box-border
 mb-4
 px-2
-py-1
 w-full
 `;

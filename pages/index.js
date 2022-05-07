@@ -1,48 +1,76 @@
-import Head from 'next/head'
-import tw from "tailwind-styled-components"
-import Header from '../components/Header'
-import Sidebar from '../components/Sidebar'
-import Main from '../components/Main'
-import Search from '../components/Search'
-import dynamic from 'next/dynamic'
-import Itinerary from '../components/Itinerary'
+import Head from "next/head";
+import { useEffect } from "react";
+import tw from "tailwind-styled-components";
+import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import Main from "../components/Main";
+//import Search from "../components/Search";
+import dynamic from "next/dynamic";
+import Itinerary from "../components/Itinerary";
 import { useAppContext } from "../store/appContext";
-import EditViewSelect from "../components/EditViewSelect"
-import EditNotes from "../components/EditNotes"
-import TripStats from "../components/TripStats"
-import Upload from "../components/Upload"
+import EditViewSelect from "../components/EditViewSelect";
+import EditNotes from "../components/EditNotes";
+import TripStats from "../components/TripStats";
+import Upload from "../components/Upload";
+import Hotel from "../components/Hotel";
+import { useAuth, createUser, db, checkIfUserExists } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const MapComponent = dynamic(() => import("../components/Map"), {
   loading: () => "Loading...",
-  ssr: false
-})
+  ssr: false,
+});
 
+const Search = dynamic(() => import("../components/Search"), {
+  loading: () => "Loading...",
+  ssr: false,
+});
 
 export default function Home() {
-
   const { state } = useAppContext();
+  const user = useAuth();
+
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => await createUser(user))();
+  }, [user]);
 
   return (
     <Wrapper>
       <Head>
-          <title>Tripmeister | travel planning app</title>
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <meta name="description" content="tripmeister - a free travel planning app"/>
-          <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.7.1/mapbox-gl.css' rel='stylesheet' />
+        <title>Tripmeister | travel planning app</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <meta
+          name="description"
+          content="tripmeister - a free travel planning app"
+        />
+        <link
+          href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.7.1/mapbox-gl.css"
+          rel="stylesheet"
+        />
       </Head>
-      <Header/>
-      <Sidebar/>
+      <Header />
+      <Sidebar />
       <Main>
-        {state.editViewType === "directions" && <Search/>}
-        {state.editViewType === "notes" && <EditNotes/>}
-        {state.editViewType === "info" && <TripStats/>}
-        {state.editViewType === "upload" && <Upload/>}
-        {state.editView && <EditViewSelect/>}
-        {state.mapView ? <MapComponent/> : <Itinerary/>}
-        
+        <Container>
+          {" "}
+          {state.editViewType === "directions" && <Search />}
+          {state.editViewType === "hotel" && <Hotel id="hotel" />}
+          {state.editViewType === "notes" && <EditNotes id="notes" />}
+          {state.editViewType === "info" && <TripStats id="stats" />}
+          {state.editViewType === "upload" && <Upload id="upload" />}
+          {state.editView && <EditViewSelect />}
+          {state.itinerary.length > 0 && (
+            <div className="hidden lg:flex z-40 w-full">
+              <Itinerary />
+            </div>
+          )}
+        </Container>
+        {state.mapView ? <MapComponent /> : <Itinerary />}
       </Main>
     </Wrapper>
-  )
+  );
 }
 
 const Wrapper = tw.div`
@@ -53,4 +81,22 @@ const Wrapper = tw.div`
     w-full
     h-screen
     bg-slate-50
-`
+    lg:m-0
+`;
+
+const Container = tw.div`
+lg:flex
+lg:flex-col
+justify-center
+items-center
+w-full
+mx-0
+    lg:absolute
+    lg:top-0
+    lg:mt-20
+    lg:left-0
+    lg:w-1/4
+    lg:z-50
+    lg:ml-8
+    z-0
+`;

@@ -2,13 +2,15 @@ import { useEffect } from "react";
 import tw from "tailwind-styled-components";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import NotesIcon from "@mui/icons-material/Notes";
+import HotelIcon from "@mui/icons-material/Hotel";
 import InfoIcon from "@mui/icons-material/Info";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import SaveIcon from '@mui/icons-material/Save';
 import { useAppContext } from "../store/appContext";
 
 const EditViewSelect = () => {
   const { state, dispatch } = useAppContext();
-  // const activeClass = "border border-slate-600 shadow-lg"
+  const isIntraDayTrip = !state.selectedStopData[5].stayOvernight;
 
   const handleClick = (e) => {
     dispatch({ type: "setEditViewType", payload: e.currentTarget.id });
@@ -30,6 +32,11 @@ const EditViewSelect = () => {
       <IconContainer className="icon_container">
         <DirectionsCarIcon onClick={(e) => handleClick(e)} id="directions" />
       </IconContainer>
+      {!isIntraDayTrip && (
+        <IconContainer className="icon_container">
+          <HotelIcon onClick={(e) => handleClick(e)} id="hotel" />
+        </IconContainer>
+      )}
       <IconContainer className={"icon_container"}>
         <NotesIcon onClick={(e) => handleClick(e)} id="notes" />
       </IconContainer>
@@ -38,6 +45,9 @@ const EditViewSelect = () => {
       </IconContainer>
       <IconContainer className="icon_container">
         <FileUploadIcon onClick={(e) => handleClick(e)} id="upload" />
+      </IconContainer>
+      <IconContainer className="icon_container bg-green-600">
+        <SaveIcon onClick={(e) => handleClick(e)} id="upload" className="text-white"/>
       </IconContainer>
     </Container>
   );

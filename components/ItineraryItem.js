@@ -10,12 +10,13 @@ const ItineraryItem = ({ item, index}) => {
   const startingpoint = item[0].place.split(",")[0];
   const destinationpoint = item[1].place.split(",")[0];
   const formattedTime = format(item[2], "dd MMM");
-  //const [selectedStyle, setSelectedStyle] = useState("")
-  const selectedStyle = state?.selectedStopData?.[5]?.['index'] === index && state.editView ? "italic font-semibold bg-[rgb(247,247,247)]" : ""
+  const leftCol = state?.itinerary?.[index]?.[5]?.['stayOvernight'] ? formattedTime : "(stopover)"
+  console.log(state.itinerary)
+
+  const selectedStyle = state?.selectedStopData?.[6]?.['index'] === index && state.editView ? "italic font-semibold bg-[rgb(247,247,247)]" : ""
 
 
   const handleClick = action => {
-    console.log(item)
     const type = action === "delete" ? "setDeleteView" : 'setEditView'
     dispatch({type, payload: true})
     dispatch({type: 'selectStop', payload: [...item, {"index" : index}]})
@@ -23,26 +24,21 @@ const ItineraryItem = ({ item, index}) => {
     dispatch({type: 'endValue', payload: ""})
   }
 
-  // useEffect(() =>{
-  //   console.log("selected")
-  //   console.log(state?.selectedStopData)
-  //     const style = state?.selectedStopData['index'] === index ? "italic font-bold" : ""
-  //     setSelectedStyle(style)
-  // },[state.selectedStopData])
+
 
   return (
     <Wrapper className={selectedStyle}>
-      <Date className={selectedStyle}>{formattedTime}</Date>
-      <Route className={selectedStyle}>{`${startingpoint} - ${destinationpoint}`}</Route>
+      <Date className={selectedStyle}>{leftCol}</Date>
+      <Route className={`${selectedStyle} truncate`}>{`${startingpoint} - ${destinationpoint}`}</Route>
       <Icons>
         <EditIcon
           fontSize="small"
-          className={`text-slate-700 hover:text-slate-900 mr-1`}
+          className={`text-slate-700 hover:text-slate-900 mr-1 cursor-pointer`}
           onClick={() => handleClick("edit")}
         />
         <DeleteIcon
           fontSize="small"
-          className={`text-slate-700 hover:text-slate-900`}
+          className={`text-slate-700 hover:text-slate-900 cursor-pointer`}
           onClick={() => handleClick("delete")}
         />
       </Icons>

@@ -26,7 +26,7 @@ const Hamburger = tw.div`
     transition-all
     duration-300
     box-border
-    absolute
+    relative
     z-90
     h-full
     w-full

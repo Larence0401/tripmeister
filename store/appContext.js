@@ -22,7 +22,9 @@ export const ContextProvider = ({ children }) => {
     startingPoint: null,
     endPoint: null,
     editStop: false, 
-    editViewType: "directions"
+    editViewType: "directions",
+    routeDetails : [],
+    tripName: ""
   };
 
   const reducer = (state, action) => {
@@ -177,6 +179,18 @@ export const ContextProvider = ({ children }) => {
           ...state,
           editViewType: action.payload
         };
+      }
+      case "setRouteDetails": {
+        return {
+          ...state,
+          routeDetails: [... state.routeDetails, action.payload]
+        }
+      }
+      case "setTripName": {
+        return {
+          ...state,
+          tripName: action.payload
+        }
       }
       default:
         return state;

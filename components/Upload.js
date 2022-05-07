@@ -18,6 +18,7 @@ const Wrapper = tw.div`
     items-start
     bg-white
     m-8
+    mx-0
     mb-4
     p-8
     h-auto
