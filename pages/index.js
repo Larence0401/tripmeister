@@ -4,27 +4,33 @@ import tw from "tailwind-styled-components";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Main from "../components/Main";
-//import Search from "../components/Search";
+import Search from "../components/Search";
 import dynamic from "next/dynamic";
 import Itinerary from "../components/Itinerary";
 import { useAppContext } from "../store/appContext";
-import EditViewSelect from "../components/EditViewSelect";
+//import EditViewSelect from "../components/EditViewSelect";
 import EditNotes from "../components/EditNotes";
 import TripStats from "../components/TripStats";
 import Upload from "../components/Upload";
 import Hotel from "../components/Hotel";
-import { useAuth, createUser, db, checkIfUserExists } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { useAuth, createUser} from "../firebase";
+
 
 const MapComponent = dynamic(() => import("../components/Map"), {
   loading: () => "Loading...",
   ssr: false,
 });
 
-const Search = dynamic(() => import("../components/Search"), {
+const EditViewSelect = dynamic(() => import("../components/EditViewSelect"), {
   loading: () => "Loading...",
   ssr: false,
 });
+
+
+// const Search = dynamic(() => import("../components/Search"), {
+//   loading: () => "Loading...",
+//   ssr: false,
+// });
 
 export default function Home() {
   const { state } = useAppContext();

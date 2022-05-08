@@ -11,9 +11,11 @@ const ItineraryItem = ({ item, index}) => {
   const destinationpoint = item[1].place.split(",")[0];
   const formattedTime = format(item[2], "dd MMM");
   const leftCol = state?.itinerary?.[index]?.[5]?.['stayOvernight'] ? formattedTime : "(stopover)"
-  console.log(state.itinerary)
+  console.log(state.editViewType)
+  //console.log(state.tripnameInput)
+  
 
-  const selectedStyle = state?.selectedStopData?.[6]?.['index'] === index && state.editView ? "italic font-semibold bg-[rgb(247,247,247)]" : ""
+  const selectedStyle = state?.selectedStopData?.[6]?.['index'] === index && state.editView ? "italic font-semibold" : ""
 
 
   const handleClick = action => {

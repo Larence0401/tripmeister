@@ -52,7 +52,7 @@ console.log(activities)
     activities.length > 0
       ? activities.map((el, i) =>
           isSelected !== i ? (
-            <ListItem className={listItemStyle}>
+            <ListItem className={`${listItemStyle} cursor-pointer`}>
               <Activity>{`- ${el.activity}`}</Activity>
               <Time>{el.timeVal}</Time>
               

@@ -3,6 +3,7 @@ import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import AutocompleteList from "./AutocompleteList";
 import useFetchSearchResults from "../hooks/useFetchSearchResults";
+import useUpdateHotel from "../hooks/useUpdateHotel";
 import CheckIcon from "@mui/icons-material/Check";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
@@ -12,18 +13,14 @@ const HotelSearch = () => {
   const [start, setStart] = useState(null);
   const fetchSearchResult = useFetchSearchResults("starting");
   const inputValue = start ? start?.place : state.startValue;
-  console.log(state.selectedStopData);
-  console.log(state.itinerary)
-  const checkIcon = state.startValue.length < 4 ? "" : <CheckIcon onClick={() => updateHotel()}/>;
-  
-
-  const updateHotel = () => {
-    const newHotel = start ? start : state.startValue
-    const index = state.selectedStopData[5]["index"]
-    const arr = [...state.itinerary]
-    arr[index].splice(3,1,newHotel)
-    dispatch({type: "updateItinerary", payload: arr})
-  };
+  const newHotel = start ? start : state.startValue;
+  const updateHotel = useUpdateHotel(newHotel);
+  const checkIcon =
+    state.startValue.length < 4 ? (
+      ""
+    ) : (
+      <CheckIcon onClick={() => updateHotel()} />
+    );
 
   useEffect(() => {
     fetchSearchResult("starting");
@@ -31,14 +28,6 @@ const HotelSearch = () => {
 
   return (
     <>
-      {/* <Input
-        placeholder="search hotel"
-        value={inputValue}
-        onChange={(e) =>
-          dispatch({ type: "startValue", payload: e.target.value })
-        }
-        onKeyDown={() => setStart(null)}
-      /> */}
       <TextField
         size="small"
         placeholder="search hotel"
@@ -63,6 +52,7 @@ const HotelSearch = () => {
 export default HotelSearch;
 
 const Input = tw.input`
+cursor-pointer
     rounded-sm
     leading-10
     uppercase

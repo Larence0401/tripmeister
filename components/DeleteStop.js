@@ -10,23 +10,23 @@ import getRoute from "../utils/getRoute";
 
 const DeleteStop = () => {
   const { state, dispatch } = useAppContext();
-  console.log(state.selectedStopData)
+  console.log(state.selectedStopData);
   const [deleted, setIsDeleted] = useState(false);
   const date = getFormattedDate(state.selectedStopData);
   const end = getEndLocation(state.selectedStopData);
   const start = getStartingLocation(state.selectedStopData);
   const stageDetails = deleted ? "line-through text-gray-600" : "";
-  const index = state.selectedStopData[5]["index"];
+  const index = state.selectedStopData[6]["index"];
   const isLastStop = index === state.itinerary.length - 1;
-  const route = useRecalculateRoute()
+  const route = useRecalculateRoute();
 
   const deleteStop = () => {
-    console.log(index)
+    console.log(index);
     setIsDeleted(true);
     let newItinerary = [...state.itinerary];
     newItinerary.splice(index, 1);
     if (!isLastStop && index !== 0) patchRoute();
-    console.log(newItinerary)
+    console.log(newItinerary);
     dispatch({ type: "updateItinerary", payload: newItinerary });
   };
 
@@ -39,26 +39,24 @@ const DeleteStop = () => {
     dispatch({ type: "patchRoute", payload: newItinerary });
   };
 
-  const recalculateRoute = async() => {
-    const result = state.itinerary.map(async(el) => {
-      const startCoords = el[0]["coordinates"]
-      const endCoords = el[1]["coordinates"]
-      const coords = await getRoute(startCoords, endCoords)
-      return [coords]
-    })
-    const newRoute = await Promise.all(result)
-    dispatch({type: 'updateRouteData', payload: newRoute})
-}
+  const recalculateRoute = async () => {
+    const result = state.itinerary.map(async (el) => {
+      const startCoords = el[0]["coordinates"];
+      const endCoords = el[1]["coordinates"];
+      const coords = await getRoute(startCoords, endCoords);
+      return [coords];
+    });
+    const newRoute = await Promise.all(result);
+    dispatch({ type: "updateRouteData", payload: newRoute });
+  };
 
-const handleClick = () => {
-  dispatch({ type: "setDeleteView", payload: false })
-  dispatch({type: 'setEditView', payload: 'directions'})
-}
-
-
+  const handleClick = () => {
+    dispatch({ type: "setDeleteView", payload: false });
+    dispatch({ type: "setEditView", payload: "directions" });
+  };
 
   useEffect(() => {
-    getRoute()
+    getRoute();
   }, [state.itinerary]);
 
   return (

@@ -5,8 +5,9 @@ import NotesIcon from "@mui/icons-material/Notes";
 import HotelIcon from "@mui/icons-material/Hotel";
 import InfoIcon from "@mui/icons-material/Info";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import SaveIcon from '@mui/icons-material/Save';
+import SaveIcon from "@mui/icons-material/Save";
 import { useAppContext } from "../store/appContext";
+import SaveTrip from "./SaveTrip";
 
 const EditViewSelect = () => {
   const { state, dispatch } = useAppContext();
@@ -29,26 +30,54 @@ const EditViewSelect = () => {
 
   return (
     <Container>
-      <IconContainer className="icon_container">
-        <DirectionsCarIcon onClick={(e) => handleClick(e)} id="directions" />
-      </IconContainer>
-      {!isIntraDayTrip && (
-        <IconContainer className="icon_container">
-          <HotelIcon onClick={(e) => handleClick(e)} id="hotel" />
-        </IconContainer>
+      {!state.tripnameInput && (
+        <>
+          <IconContainer className="icon_container">
+            <DirectionsCarIcon
+              onClick={(e) => handleClick(e)}
+              id="directions"
+            />
+          </IconContainer>
+          {!isIntraDayTrip && (
+            <IconContainer className="icon_container">
+              <HotelIcon onClick={(e) => handleClick(e)} id="hotel" />
+            </IconContainer>
+          )}
+          <IconContainer className={"icon_container"}>
+            <NotesIcon onClick={(e) => handleClick(e)} id="notes" />
+          </IconContainer>
+          <IconContainer className="icon_container">
+            <InfoIcon onClick={(e) => handleClick(e)} id="info" />
+          </IconContainer>
+          <IconContainer className="icon_container">
+            <FileUploadIcon onClick={(e) => handleClick(e)} id="upload" />
+          </IconContainer>
+        </>
       )}
-      <IconContainer className={"icon_container"}>
-        <NotesIcon onClick={(e) => handleClick(e)} id="notes" />
-      </IconContainer>
-      <IconContainer className="icon_container">
-        <InfoIcon onClick={(e) => handleClick(e)} id="info" />
-      </IconContainer>
-      <IconContainer className="icon_container">
-        <FileUploadIcon onClick={(e) => handleClick(e)} id="upload" />
-      </IconContainer>
-      <IconContainer className="icon_container bg-green-600">
-        <SaveIcon onClick={(e) => handleClick(e)} id="upload" className="text-white"/>
-      </IconContainer>
+
+      <SaveTrip />
+
+      {/* <IconContainer className="icon_container">
+            <DirectionsCarIcon
+              onClick={(e) => handleClick(e)}
+              id="directions"
+            />
+          </IconContainer>
+          {!isIntraDayTrip && (
+            <IconContainer className="icon_container">
+              <HotelIcon onClick={(e) => handleClick(e)} id="hotel" />
+            </IconContainer>
+          )}
+          <IconContainer className={"icon_container"}>
+            <NotesIcon onClick={(e) => handleClick(e)} id="notes" />
+          </IconContainer>
+          <IconContainer className="icon_container">
+            <InfoIcon onClick={(e) => handleClick(e)} id="info" />
+          </IconContainer>
+          <IconContainer className="icon_container">
+            <FileUploadIcon onClick={(e) => handleClick(e)} id="upload" />
+          </IconContainer>
+          <SaveTrip /> */}
     </Container>
   );
 };

@@ -19,7 +19,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   const [index, setSelectedIndex] = useState(null);
   const [distance, setDistance] = useState([]);
   const [detailsShown, setDetailsShown] = useState(null);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(false);
   const coords = state?.selectedStopData?.[1]?.["coordinates"];
   const uneven = "bg-[rgb(247,247,247)]";
   const location = getEndLocation(state.selectedStopData);
@@ -105,7 +105,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
           <>
             <Row
               className={selected === i ? active : i % 2 === 0 ? uneven : null}
-              onClick={() => setSelected((prev) => (i === prev ? null : i))}
+              onClick={() => setSelected((prev) => (i === prev ? false : i))}
             >
               <ListCol1>{hotelData.length > 0 && getHotelName(el)}</ListCol1>
               <ListCol2>{distance[i]}</ListCol2>
@@ -133,7 +133,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
             )}
           </>
         ))}
-        {selected && (
+        {(selected !== false) && (
           <Button
             onClick={() => handleSubmit()}
           >{`select ${accommodationType}`}</Button>
@@ -176,6 +176,7 @@ flex
 p-2
 text-sm
 items-center
+cursor-pointer
 `;
 
 const ListCol1 = tw.div`
