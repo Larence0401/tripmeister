@@ -6,7 +6,6 @@ import ZoomInMapIcon from "@mui/icons-material/ZoomInMap";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import MapIcon from "@mui/icons-material/Map";
-//import getRoute from "../utils/getRoute"
 
 const MapComponent = () => {
   const { state, dispatch } = useAppContext();
@@ -14,17 +13,21 @@ const MapComponent = () => {
   const [isListView, setIsListView] = useState(false);
   const mapRef = useRef();
 
+  const getMarkers = (no) => {
+    if (state.itinerary?.length < 1) return;
+    const coords =
+      state.selectedStopData.length === 0
+        ? state.itinerary[state.itinerary.length - 1][no - 1].coordinates
+        : state?.selectedStopData?.[no - 1]?.coordinates;
+    return coords;
+  };
 
-  const marker2 =
-    state.itinerary?.length > 0
-      ? state.itinerary[state.itinerary.length - 1][1]["coordinates"]
-      : null;
+  state.itinerary?.length < 1
+    ? null
+    : console.log(state.itinerary[state.itinerary.length - 1][0].coordinates);
 
-  const marker1 =
-    state.itinerary?.length > 0
-      ? state.itinerary[state.itinerary.length - 1][0]["coordinates"]
-      : null;
-
+  const marker1 = getMarkers(1);
+  const marker2 = getMarkers(2);
 
   const [viewstate, setViewState] = useState({
     latitude: "52.5200",
@@ -50,11 +53,12 @@ const MapComponent = () => {
         coordinates: route,
       },
     };
-    //setRouteData(geojson);
+
     dispatch({ type: "storeRouteData", payload: [geojson] });
   };
 
-  const getMarkerColor = (stop) => stop?.[5]?.stayOvernight ? "bg-green-300" : ""
+  const getMarkerColor = (stop) =>
+    stop?.[5]?.stayOvernight ? "bg-green-300" : "";
 
   const getCoordinates = (type) => {
     if (state.itinerary.length < 1) return;
@@ -80,29 +84,53 @@ const MapComponent = () => {
     const maxLat = latitudes_array.sort().reverse()[0];
     const minLong = longitudes_array.sort()[0];
     const maxLong = longitudes_array.sort().reverse()[0];
+    const val =
+      window.innerWidth >= 1024
+        ? getDesktopFitBounds(minLong, maxLong)
+        : minLong;
     const fitBounds = [
       [...maxLong, ...maxLat],
-      [...minLong, ...minLat],
+      [val, ...minLat],
     ];
     return fitBounds;
   };
 
+  const getDesktopFitBounds = (minLong, maxLong) => {
+    const newMinLong = minLong - (maxLong - minLong) / 2.5;
+    return newMinLong;
+  };
 
   useEffect(() => {
     if (state.itinerary.length === 0) return;
-    getRoute()
-
+    getRoute();
+    const phantomMarkers = modifyFitBounds();
+    const markerPair =
+      window.innerWidth >= 1024 ? phantomMarkers : [marker1, marker2];
     const fitBounds =
-      zoomedOut && state.itinerary.length > 0
-        ? getFitBounds()
-        : [marker1, marker2];
-    mapRef.current?.fitBounds(fitBounds, { padding: 60});
-  }, [state.itinerary, zoomedOut]);
+      zoomedOut && state.itinerary.length > 0 ? getFitBounds() : markerPair;
+    mapRef.current?.fitBounds(fitBounds, { padding: 60 });
+    modifyFitBounds();
+  }, [state.itinerary, zoomedOut, state.selectedStopData]);
 
   const StartMarkerProps = {
-    color: '#000000',
+    color: "#000000",
     longitude: state.itinerary[0]?.[0]["coordinates"][0],
     latitude: state.itinerary[0]?.[0]["coordinates"][1],
+  };
+
+  const modifyFitBounds = () => {
+    const isToEast = marker1[0] - marker2[0] < 0 ? true : false;
+    if (isToEast) {
+      const newLong1 = marker1[0] + (marker1[0] - marker2[0]) / 2.5;
+      const phantomMarker1 = [newLong1, marker1[1]];
+      const markers1 = [phantomMarker1, marker2];
+      return markers1;
+    } else {
+      const newLong2 = marker2[0] - (marker1[0] - marker2[0]) / 2.5;
+      const phantomMarker2 = [newLong2, marker2[1]];
+      const markers2 = [marker1, phantomMarker2];
+      return markers2;
+    }
   };
 
   const markers =
@@ -131,7 +159,6 @@ const MapComponent = () => {
         ))
       : null;
 
-
   return (
     <Wrapper>
       <Map
@@ -157,17 +184,17 @@ const MapComponent = () => {
         )}
         {!isListView ? (
           <div className="lg:hidden">
-          <ViewListIcon
-            className="absolute right-0 m-4 text-slate-900"
-            fontSize="large"
-            onClick={() => dispatch({type: 'setMapView', payload: false})}
-          />
+            <ViewListIcon
+              className="absolute right-0 m-4 text-slate-900"
+              fontSize="large"
+              onClick={() => dispatch({ type: "setMapView", payload: false })}
+            />
           </div>
         ) : (
           <MapIcon
             className="absolute right-0 m-4 text-slate-900"
             fontSize="large"
-            onClick={() => dispatch({type: 'setMapView', payload: true})}
+            onClick={() => dispatch({ type: "setMapView", payload: true })}
           />
         )}
         {state.itinerary.length > 0 && <Marker {...StartMarkerProps} />}

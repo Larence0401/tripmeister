@@ -3,7 +3,7 @@ import { useAppContext } from "../store/appContext";
 import getRoute from "../utils/getRoute";
 
 const useRecalculateRoute = () => {
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const [route,setRoute] = useState([])
 
     const recalculateRoute = async () => {
@@ -14,14 +14,14 @@ const useRecalculateRoute = () => {
         return [coords];
       });
       const newRoute = await Promise.all(result);
-      setRoute(newRoute)
+      dispatch({ type: "updateRouteData", payload: newRoute });
     };
 
     useEffect(() => {
       recalculateRoute()
     },[])
 
-    return route
+    return recalculateRoute
 };
 
 export default useRecalculateRoute;

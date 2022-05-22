@@ -3,7 +3,6 @@ import tw from "tailwind-styled-components";
 import MapIcon from "@mui/icons-material/Map";
 import { useAppContext } from "../store/appContext";
 import ItineraryItem from "./ItineraryItem";
-//import SaveTrip from "./SaveTrip";
 import DeleteStop from "./DeleteStop";
 import AddIcon from "@mui/icons-material/Add";
 import dynamic from "next/dynamic";
@@ -20,6 +19,8 @@ const Itinerary = () => {
     ? "translate-x-[250px] duration-300 ease-in-out"
     : "-translate-x-0 duration-300 ease-in-out";
 
+  const marginTop = state.readingMode ? "" : "mt-12";
+
   const handleClick = () => {
     dispatch({ type: "setEditView", payload: false });
     dispatch({ type: "setEditViewType", payload: "directions" });
@@ -27,7 +28,7 @@ const Itinerary = () => {
 
   return (
     <Wrapper className={slideIn}>
-      {state.editView && !state.deleteView && (
+      {state.editView && !state.deleteView && !state.readingMode && (
         <AddStop onClick={() => handleClick()}>
           add new stop
           <AddIcon className="ml-2" />
@@ -40,13 +41,16 @@ const Itinerary = () => {
           onClick={() => dispatch({ type: "setMapView", payload: true })}
         />
       </div>
-      {state.itinerary.length > 0 && !state.editView && <SaveTrip />}
+      {state.itinerary.length > 0 && !state.editView && !state.readingMode && (
+        <SaveTrip />
+      )}
       {state.deleteView ? (
         <DeleteStop listItem={listItem} />
       ) : (
-        <ListContainer>
+        <ListContainer className={marginTop}>
           {state.itinerary.map((item, index) => (
             <ItineraryItem
+              key={index}
               item={item}
               index={index}
               setListItem={setListItem}
@@ -77,15 +81,17 @@ const Wrapper = tw.div`
     `;
 
 const ListContainer = tw.div`
-    mt-4
     w-full
-    mt-12`;
+    pt-8
+    lg:pt-0
+`;
 
 const AddStop = tw.div`
     uppercase
     py-1
     px-3
     text-slate-900
+    hover:bg-[rgb(247,247,247)]
     border
     rounded-sm
     border-slate-900
@@ -94,6 +100,5 @@ const AddStop = tw.div`
     absolute
     flex
     items-center
+    cursor-pointer
     left-0`;
-
-

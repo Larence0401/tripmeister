@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import tw from "tailwind-styled-components";
 import SaveIcon from "@mui/icons-material/Save";
 import CheckIcon from "@mui/icons-material/Check";
@@ -22,7 +22,6 @@ const SaveTrip = () => {
   const [tripnameInput, setTripnameInput] = useState(null);
   const router = useRouter();
   const user = useAuth();
-
   const checkIcon =
     tripnameInput && tripnameInput.length < 4 ? (
       ""
@@ -33,15 +32,20 @@ const SaveTrip = () => {
       />
     );
 
+  const textFieldRef = useRef();
+
   const handleKeyDown = async (e) => {
     e.key === "Enter" && tripnameInput && tripnameInput.length > 3
       ? await saveTrip()
       : null;
   };
 
-  const handleClickOnTripName = async () =>
+  const handleClickOnTripName = async () => {
     tripnameInput && tripnameInput.length > 3 ? await saveTrip() : null;
-  //dispatch({ type: "setTripnameInput", payload: false })
+    dispatch({ type: "setTripnameInput", payload: false });
+    dispatch({ type: "requestUpload", payload: false });
+  };
+
   const addItinerary = async () => {
     const colRef = collection(db, "users", user?.uid, "itineraries");
     await addDoc(colRef, {
@@ -51,6 +55,10 @@ const SaveTrip = () => {
   };
 
   const handleClickonSaveBtn = async () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
     !state.tripName
       ? dispatch({ type: "setTripnameInput", payload: true })
       : showSuccessMsg();
@@ -64,13 +72,12 @@ const SaveTrip = () => {
   const saveTrip = async () => {
     dispatch({ type: "setTripName", payload: tripnameInput });
     if (state.editView) dispatch({ type: "setTripnameInput", payload: false });
-    user ? await addItinerary() : router.push("/login");
+    await addItinerary();
     setTripnameInput(null);
     showSuccessMsg();
   };
 
   const queryTripID = async () => {
-    console.log("query");
     const colRef = collection(db, "users", user?.uid, "itineraries");
     const q = query(colRef, where("tripname", "==", state.tripName));
     const querySnapshot = await getDocs(q);
@@ -107,10 +114,10 @@ const SaveTrip = () => {
     const saveIcon = document.getElementById("save_icon");
     const checkIcon = document.getElementById("check_icon");
     saveIcon.style.display = "none";
-    checkIcon.style.display = "flex"
+    checkIcon.style.display = "flex";
     setTimeout(() => {
       saveIcon.style.display = "flex";
-      checkIcon.style.display = "none"
+      checkIcon.style.display = "none";
     }, 800);
   };
 
@@ -119,16 +126,20 @@ const SaveTrip = () => {
   }, [state.tripID]);
 
   useEffect(() => {
-    dispatch({ type: "setTripnameInput", payload: false });
+    if (state.tripName) dispatch({ type: "setTripnameInput", payload: false });
   }, [state.tripName]);
 
-  console.log(state.tripnameInput);
+  useEffect(() => {
+    console.log(state.uploadRequested);
+    if (state.uploadRequested) textFieldRef.current.focus();
+  }, [state.uploadRequested]);
 
   return (
     <>
       {state.editView ? (
         <>
-          {!state.tripnameInput || state.tripName ? (
+          {(!state.tripnameInput && !state.uploadRequested) ||
+          state.tripName ? (
             <IconContainer
               className="icon_container bg-green-600"
               onClick={() => handleClickonSaveBtn()}
@@ -139,6 +150,7 @@ const SaveTrip = () => {
           ) : (
             <TextField
               className="p-2 w-full bg-white shadow-md rounded-lg"
+              inputRef={textFieldRef}
               size="small"
               placeholder="Please choose a name for your trip"
               onKeyUp={(e) => setTripnameInput(e.target.value)}

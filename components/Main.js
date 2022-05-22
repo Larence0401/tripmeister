@@ -1,14 +1,13 @@
 import React from "react";
 import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
-import getTopPosition from "../utils/getTopPosition"
-import Itinerary from "./Itinerary"
 
 const Main = ({ children }) => {
   const { state, dispatch } = useAppContext();
+  const isHidden = state.sidebarIsOpen && window.innerWidth <= 1024 ? "hidden" : ""
 
   return (
-    <Wrapper>
+    <Wrapper className={isHidden}>
       {state.itinerary.length === 0 && (
         <Headline>Start planning your trip ...</Headline>
       )}

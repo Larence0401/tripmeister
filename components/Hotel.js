@@ -10,21 +10,30 @@ import SearchIcon from "@mui/icons-material/Search";
 import HotelSuggestions from "./HotelSuggestions";
 import HotelSearch from "./HotelSearch";
 
+// this component lets the user edit and delete a selected accommodation. The hotel component also renders 2 child components for rendering suggested accommodations and for
+//searching by name and
+
 const Hotel = () => {
   const [isSearch, setIsSearch] = useState(false);
   const [hotelSelected, setHotelSelected] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const index = state?.selectedStopData?.[6]?.["index"];
   const hotelName = state?.itinerary?.[index]?.[3]?.["text"];
   const address = state?.itinerary?.[index]?.[3]?.["properties"]?.["address"];
+  const slideIn = state.sidebarIsOpen
+  ? "translate-x-[250px] duration-300 ease-in-out"
+  : "-translate-x-0 duration-300 ease-in-out";
 
-  const deleteHotel = () => state.itinerary?.[index].splice(3,1,"no hotel selected")
-
+  const deleteHotel = () => {
+    const arr = state?.itinerary
+    arr?.[index].splice(3,1,{accommodation: "no accommodation selected"})
+    dispatch({type: "updateItinerary", payload: arr})
+  }
 
   return (
-    <Wrapper>
-      {(hotelSelected || (hotelName && !hotelSelected)) && !isEditMode && (
+    <Wrapper className={slideIn}>
+      {(hotelSelected || (hotelName && !hotelSelected)) && (!isEditMode || !state.editMode) && (
         <HotelData>
           <div className="flex flex-col">
             <HotelName>{hotelName}</HotelName>
@@ -61,7 +70,7 @@ const Hotel = () => {
         </SearchSelect>
       )}
 
-      {((!hotelSelected && !isSearch && !hotelName) || isEditMode) && (
+      {((!hotelSelected && !isSearch && !hotelName) || (isEditMode && !isSearch)) && (
         <HotelSuggestions
           setHotelSelected={setHotelSelected}
           setIsEditMode={setIsEditMode}

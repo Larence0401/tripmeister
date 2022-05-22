@@ -6,7 +6,7 @@ import getEndLocation from "../utils/getEndLocation";
 import { useAppContext } from "../store/appContext";
 
 const Activities = () => {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
   const index = state.selectedStopData[6]["index"];
   const activities = state.itinerary[index][4]["activities"];
   const start = getStartingLocation(state.selectedStopData);
@@ -17,8 +17,7 @@ const Activities = () => {
   };
   const startList = filterByLocation(start);
   const endList = filterByLocation(end);
-  console.log(filterByLocation(start));
-  console.log(filterByLocation(end));
+
   return (
     <>
       {startList.length > 0 && (

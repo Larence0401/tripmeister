@@ -8,9 +8,10 @@ import getStartingLocation from "../utils/getStartingLocation";
 import useRecalculateRoute from "../hooks/useRecalculateRoute";
 import getRoute from "../utils/getRoute";
 
+// This component not only lets the user delete a stage of the itinerary, but also recalculates the route based on the new stops after deletion.
+
 const DeleteStop = () => {
   const { state, dispatch } = useAppContext();
-  console.log(state.selectedStopData);
   const [deleted, setIsDeleted] = useState(false);
   const date = getFormattedDate(state.selectedStopData);
   const end = getEndLocation(state.selectedStopData);
@@ -21,12 +22,10 @@ const DeleteStop = () => {
   const route = useRecalculateRoute();
 
   const deleteStop = () => {
-    console.log(index);
     setIsDeleted(true);
     let newItinerary = [...state.itinerary];
     newItinerary.splice(index, 1);
     if (!isLastStop && index !== 0) patchRoute();
-    console.log(newItinerary);
     dispatch({ type: "updateItinerary", payload: newItinerary });
   };
 

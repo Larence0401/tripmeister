@@ -1,11 +1,14 @@
-import React from "react";
+import { useState } from "react";
 import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
 import { signOutUser, useAuth } from "../firebase";
 import Link from "next/link";
-import AddIcon from "@mui/icons-material/Add";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import TripList from "./TripList";
+import CreateNewTrip from "./CreateNewTrip";
 
 const Sidebar = () => {
   const { state } = useAppContext();
@@ -14,7 +17,8 @@ const Sidebar = () => {
     : "-translate-x-0 duration-300 ease-in-out";
 
   const user = useAuth();
-  console.log(user);
+  const [tripsShown, setTripsShown] = useState(false);
+
 
   return (
     <Wrapper className={slideIn}>
@@ -22,24 +26,33 @@ const Sidebar = () => {
         <p className="text-white mb-4">{`Hello, ${user.displayName}`}</p>
       )}
       {user ? (
-        <LogInout onClick={signOutUser}>
-          <span className="text-lg">Logout</span>
-          <LogoutIcon className="text-white ml-4" />
-        </LogInout>
+        <MenuItem onClick={signOutUser}>
+          <span>Logout</span>
+          <LogoutIcon className="ml-4 text-lg" />
+        </MenuItem>
       ) : (
         <Link href="/login">
           <a>
-            <LogInout>
-              <span className="text-lg">LogIn</span>
-              <LoginIcon className="text-white ml-4" />
-            </LogInout>
+            <MenuItem>
+              <span>LogIn</span>
+              <LoginIcon className="ml-4 text-lg" />
+            </MenuItem>
           </a>
         </Link>
       )}
-      <MenuItem>
-        add new trip
-        <AddIcon className="ml-2"/>
-      </MenuItem>
+      <CreateNewTrip />
+      {user && (
+        <MenuItem onClick={() => setTripsShown((prev) => !prev)}>
+          My trips
+          {!tripsShown ? (
+            <ArrowRightIcon className="ml-2" />
+          ) : (
+            <ArrowDropDownIcon className="ml-2" />
+          )}
+        </MenuItem>
+      )}
+
+      {tripsShown && <TripList />}
     </Wrapper>
   );
 };
@@ -49,10 +62,10 @@ export default Sidebar;
 const Wrapper = tw.div`
 flex
 flex-col
-items-end
+items-start
 bg-slate-600
 opacity-90
-    p-8
+    p-6
     z-40
     w-[250px]
     fixed
@@ -70,13 +83,14 @@ uppercase
     items-center`;
 
 const MenuItem = tw.div`
-text-white
-uppercase
-border-y
-border-slate-200
-py-1
-flex
-items-center
-w-full
-hover:bg-slate-700
-`;
+    text-white
+    uppercase
+    border-b
+    border-slate-400
+    py-4
+    flex
+    items-center
+    w-full
+    hover:bg-slate-700
+    cursor-pointer
+    `;

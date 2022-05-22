@@ -27,8 +27,9 @@ const TripStats = () => {
   const avgDuration = getFormattedTime(totalDuration / days) 
   const avgDistance = Math.floor(totalDistance / days / 1000) + " km"
   const section = " (" + getStartingLocation(state.selectedStopData) + " - " + getEndLocation(state.selectedStopData) + ")"
-
-  console.log(state.itinerary)
+  const slideIn = state.sidebarIsOpen
+  ? "translate-x-[250px] duration-300 ease-in-out"
+  : "-translate-x-0 duration-300 ease-in-out";
 
   const getTotalValue = async(type) => {
       const result = state.itinerary.map(async(el) => {
@@ -54,7 +55,7 @@ const TripStats = () => {
   },[start,stop])
 
   return (
-    <Wrapper>
+    <Wrapper className={slideIn}>
       <Header>{`Day ${day} / ${days} ${section}`}</Header>
       <Table>
         <Row>

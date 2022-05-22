@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -6,11 +6,12 @@ import TextField from "@mui/material/TextField";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckIcon from "@mui/icons-material/Check";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import ActivityList from "./ActivityList";
-import Activities from "./Activities"
+import Activities from "./Activities";
 import getStartingLocation from "../utils/getStartingLocation";
 import getEndLocation from "../utils/getEndLocation";
 import TimeField from "react-simple-timefield";
+
+// this component lets the user input activities in a specific location
 
 const EditNotes = () => {
   const [activityInput, setActivityInput] = useState(false);
@@ -27,12 +28,14 @@ const EditNotes = () => {
     activity === "" ? (
       ""
     ) : (
-      // <CheckIcon onClick={() => submitActivity(activity)} />
       <CheckIcon onClick={() => setShowLocationSelect(true)} />
     );
+  const slideIn = state.sidebarIsOpen
+    ? "translate-x-[250px] duration-300 ease-in-out"
+    : "-translate-x-0 duration-300 ease-in-out";
 
   const submitActivity = () => {
-    setTimeSelect(false)
+    setTimeSelect(false);
     setActivityInput(false);
     const arr = [...state.itinerary];
     const index = state.selectedStopData[6]["index"];
@@ -46,25 +49,16 @@ const EditNotes = () => {
     setLocation(location);
     setShowLocationSelect(false);
     setTimeSelect(true);
-    setShowTimeField(false)
+    setShowTimeField(false);
   };
 
-
-
-  console.log(state.itinerary);
-
   return (
-    <Wrapper>
+    <Wrapper className={slideIn}>
       <ActivityContainer>
-        {/* <ActivityList /> */}
-        <Activities/>
+        <Activities />
         {!activityInput && (
-          <AddActivity>
-            add activity{" "}
-            <AddCircleIcon
-              className="ml-2"
-              onClick={() => setActivityInput(true)}
-            />
+          <AddActivity onClick={() => setActivityInput(true)}>
+            add activity <AddCircleIcon className="ml-2" />
           </AddActivity>
         )}
         {activityInput && !showLocationSelect && !timeSelect && (
@@ -102,10 +96,11 @@ const EditNotes = () => {
               <input
                 type="checkbox"
                 className="mr-4 scale-150"
-                onChange={() => setShowTimeField(prev => !prev)}
+                onChange={() => setShowTimeField((prev) => !prev)}
               />
               {showTimeField && (
                 <TimeField
+                  style={{ width: 50 }}
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                 />
@@ -143,6 +138,7 @@ const AddActivity = tw.div`
     leading-10
     rounded-lg
     bg-slate-600
+    hover:bg-slate-700
     text-slate-100
     font-semibold
     text-lg
@@ -153,6 +149,7 @@ const AddActivity = tw.div`
     items-center
     justify-center
     text-center
+    cursor-pointer
 `;
 
 const ActivityContainer = tw.div`
@@ -163,6 +160,7 @@ const LocationSelect = tw.div`
 w-full
 flex
 items-center
+cursor-pointer
 `;
 const Button = tw.div`
 w-1/2
@@ -174,6 +172,7 @@ border-slate-600
 rounded-md
 text-center
 uppercase
+hover:bg-[rgb(247,247,247)]
 `;
 
 const TimeContainer = tw.div`

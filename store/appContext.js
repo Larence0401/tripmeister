@@ -26,7 +26,10 @@ export const ContextProvider = ({ children }) => {
     routeDetails : [],
     tripName: null,
     tripID: null,
-    tripnameInput: false
+    tripnameInput: false,
+    readingMode: false,
+    uploadRequested: false,
+    downloadUrls: []
   };
 
   const reducer = (state, action) => {
@@ -204,6 +207,24 @@ export const ContextProvider = ({ children }) => {
         return {
           ...state,
           tripnameInput: action.payload
+        }
+      }
+      case "setReadingMode": {
+        return {
+          ...state,
+          readingMode: action.payload
+        }
+      }
+      case "requestUpload": {
+        return {
+          ...state,
+          uploadRequested: action.payload
+        }
+      }
+      case "setDownloadUrls": {
+        return {
+          ...state,
+          downloadUrls: action.payload
         }
       }
       default:

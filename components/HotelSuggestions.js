@@ -3,13 +3,14 @@ import { FormControl, Select, MenuItem } from "@mui/material";
 import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import getHotels from "../utils/getHotels";
-import getRideDetails from "../utils/getRideDetails";
 import getEndLocation from "../utils/getEndLocation";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import Icon from "@mui/material/Icon";
 import HotelDetails from "./HotelDetails";
 import useUpdateHotel from "../hooks/useUpdateHotel";
+import useGetDistanceToCityCenter from "../hooks/useGetDistanceToCityCenter";
+import useSortFeaturesByDistance from "../hooks/useSortFeaturesByDistance";
 
 const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   const { state, dispatch } = useAppContext();
@@ -17,7 +18,6 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   const [accommodationType, setAccommodationType] = useState("hotel");
   const [hotelData, setHotelData] = useState([]);
   const [index, setSelectedIndex] = useState(null);
-  const [distance, setDistance] = useState([]);
   const [detailsShown, setDetailsShown] = useState(null);
   const [selected, setSelected] = useState(false);
   const coords = state?.selectedStopData?.[1]?.["coordinates"];
@@ -26,29 +26,12 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   const active = "bg-slate-600 text-slate-100";
 
   const updateHotel = useUpdateHotel(hotelData?.[index]);
+  const [distance, getDistanceToCityCenter] =
+    useGetDistanceToCityCenter(hotelData);
+  const [sortedFeatures, sortFeaturesByDistance] = useSortFeaturesByDistance();
+
   const getHotelName = (hotel) => {
     return hotel?.place_name.split(",")[0];
-  };
-
-  const formatDistance = (dist) => {
-    const output =
-      dist < 1000
-        ? Math.floor(dist) + " m"
-        : Math.floor(dist / 1000) + "." + (dist % 1000).toString()[0] + " km";
-    return output;
-  };
-
-  const getDistanceToCityCenter = async (hotel) => {
-    if (hotelData.length === 0) return;
-    const result = hotelData.map(async (el) => {
-      const end = el.center;
-      const data = await getRideDetails(coords, end);
-      const dist = data.distance;
-      const output = formatDistance(dist);
-      return output;
-    });
-    const array = await Promise.all(result);
-    setDistance(array);
   };
 
   const handleSubmit = () => {
@@ -67,7 +50,8 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   }, [index]);
 
   useEffect(() => {
-    if (hotelData.length === 0) return;
+    if (hotelData?.length === 0) return;
+    console.log(hotelData)
     getDistanceToCityCenter(hotelData);
   }, [hotelData]);
 
@@ -77,6 +61,15 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
       setHotelData(hotelData);
     })();
   }, [accommodationType, state.selectedStopData]);
+
+  useEffect(() => {
+    if(distance) console.log(distance)
+    sortFeaturesByDistance(distance, hotelData);
+  }, [distance]);
+
+  useEffect(() => {
+      if(sortedFeatures) console.log(sortedFeatures)
+  },[sortedFeatures])
 
   return (
     <>
@@ -101,39 +94,45 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
         {hotelData.length < 1 && (
           <p className="italic text-red-500">{`No ${accommodationType}s in ${location}!`}</p>
         )}
-        {hotelData.map((el, i) => (
-          <>
-            <Row
-              className={selected === i ? active : i % 2 === 0 ? uneven : null}
-              onClick={() => setSelected((prev) => (i === prev ? false : i))}
-            >
-              <ListCol1>{hotelData.length > 0 && getHotelName(el)}</ListCol1>
-              <ListCol2>{distance[i]}</ListCol2>
-              <ListCol3>
-                <Icon className="text-right">
-                  {detailsShown === i ? (
-                    <ArrowDropUpIcon
-                      onClick={() => setDetailsShown(null)}
-                      fontSize="medium"
-                    />
-                  ) : (
-                    <ArrowDropDownIcon
-                      onClick={() => setDetailsShown(i)}
-                      fontSize="medium"
-                    />
-                  )}
-                </Icon>
-              </ListCol3>
-            </Row>
-            {detailsShown === i && (
-              <HotelDetails
-                address={el.properties.address}
-                district={el.context[1]["text"]}
-              />
-            )}
-          </>
-        ))}
-        {(selected !== false) && (
+        {sortedFeatures &&
+          sortedFeatures.map((el, i) => (
+            <>
+              <Row
+                className={
+                  selected === i ? active : i % 2 === 0 ? uneven : null
+                }
+                onClick={() => setSelected((prev) => (i === prev ? false : i))}
+                key={i}
+              >
+                <ListCol1>
+                  {hotelData.length > 0 && getHotelName(el.data)}
+                </ListCol1>
+                <ListCol2>{el.distance}</ListCol2>
+                <ListCol3>
+                  <Icon className="text-right">
+                    {detailsShown === i ? (
+                      <ArrowDropUpIcon
+                        onClick={() => setDetailsShown(null)}
+                        fontSize="medium"
+                      />
+                    ) : (
+                      <ArrowDropDownIcon
+                        onClick={() => setDetailsShown(i)}
+                        fontSize="medium"
+                      />
+                    )}
+                  </Icon>
+                </ListCol3>
+              </Row>
+              {detailsShown === i && (
+                <HotelDetails
+                  address={el.data.properties.address}
+                  district={el.data.context[1]["text"]}
+                />
+              )}
+            </>
+          ))}
+        {selected !== false && (
           <Button
             onClick={() => handleSubmit()}
           >{`select ${accommodationType}`}</Button>

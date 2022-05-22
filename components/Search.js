@@ -11,20 +11,23 @@ import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import HotelIcon from "@mui/icons-material/Hotel";
 
-
 const Search = () => {
   const { dispatch, state } = useAppContext();
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [newDate, setNewDate] = useState(new Date());
   const [datePlus, setDatePlus] = useState(new Date());
-  const accommodation = state.itinerary?.[3]?.id ? state.itinerary?.[3] : { accommodation_test: "" }
+  const accommodation = state.itinerary?.[3]?.id
+    ? state.itinerary?.[3]
+    : { accommodation_test: "" };
   const activities = { activities: [] };
   const [focus, setFocus] = useState("");
   const [stayOvernight, setStayOvernight] = useState({ stayOvernight: true });
   const [isUpdated, setIsUpdated] = useState({ start: false, end: false });
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
-  const bedColor = stayOvernight.stayOvernight ? "text-blue-500" : "text-gray-500";
+  const bedColor = stayOvernight.stayOvernight
+    ? "text-blue-500"
+    : "text-gray-500";
   const dateInput = end ? "w-2/3" : "w-full";
   const stopData =
     state.itinerary.length === 0
@@ -42,15 +45,12 @@ const Search = () => {
   const updatedEnd = end ? end : state.selectedStopData[1];
   const updatedDate = newDate ? newDate : state.selectedStopData[2];
   const updatedStopData = [updatedStart, updatedEnd, updatedDate];
-  const isStayOvernight = state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight
+  const isStayOvernight =
+    state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight;
 
   const slideIn = state.sidebarIsOpen
-  ? "translate-x-[250px] duration-300 ease-in-out"
-  : "-translate-x-0 duration-300 ease-in-out";
-
-
-
-
+    ? "translate-x-[250px] duration-300 ease-in-out"
+    : "-translate-x-0 duration-300 ease-in-out";
 
   const startValue =
     state?.editView && focus !== "start" && !start
@@ -68,11 +68,8 @@ const Search = () => {
 
   const buttonText = state.editView ? "update stop" : "add stop";
 
-  console.log(newDate)
-
   const handleSubmit = () => {
     if ((!start && !state.selectedStopData) || !end) return;
-    console.log("click");
     if (!state.editView) {
       dispatch({ type: "createStage", payload: stopData });
       setEnd(null);
@@ -83,16 +80,11 @@ const Search = () => {
     dispatch({ type: "endValue", payload: "" });
   };
 
-  // const addDay = () => {
-  //   let result = state.itinerary?.[state.itinerary?.length - 1]?.[2];
-  //   result.setDate(result.getDate() + 1);
-  //   setDatePlus(result)
-  // };
-
   const getNewStartDate = () => {
-    const isStayOvernight = state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight
-    if(isStayOvernight) addDay()
-  }
+    const isStayOvernight =
+      state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight;
+    if (isStayOvernight) addDay();
+  };
 
   const updateItinerary = () => {
     const index = state?.selectedStopData?.[5]?.["index"];
@@ -151,10 +143,6 @@ const Search = () => {
     dispatch({ type: "updateRouteData", payload: newRoute });
   };
 
-
-  //console.log(date.setDate(date.getDate() + 1))
-  //if(state.itinerary.length > 0) console.log(addDay())
-
   useEffect(() => {
     if (start) {
       dispatch({ type: "resetStartSuggestions" });
@@ -173,7 +161,6 @@ const Search = () => {
 
   useEffect(() => {
     recalculateRoute();
-   // getNewStartDate()
   }, [state.itinerary]);
 
   useEffect(() => {
@@ -192,12 +179,12 @@ const Search = () => {
   }, [state.editView]);
 
   useEffect(() => {
-    if(!isStayOvernight) return;
-    let dateOld = newDate.getTime()
-    const datePlus = dateOld + (3600 * 24 * 1000)
-    const date = new Date(datePlus)
-    setNewDate(date)
-  },[state.itinerary.length])
+    if (!isStayOvernight) return;
+    let dateOld = newDate.getTime();
+    const datePlus = dateOld + 3600 * 24 * 1000;
+    const date = new Date(datePlus);
+    setNewDate(date);
+  }, [state.itinerary.length]);
 
   return (
     <Wrapper className={slideIn}>
@@ -248,7 +235,7 @@ const Search = () => {
             className="text-blue-500"
             onClick={() =>
               setStayOvernight((prev) => {
-                return {stayOvernight: !prev.stayOvernight };
+                return { stayOvernight: !prev.stayOvernight };
               })
             }
           />
@@ -258,7 +245,7 @@ const Search = () => {
             className="text-gray-500"
             onClick={() =>
               setStayOvernight((prev) => {
-                return {stayOvernight: !prev.stayOvernight };
+                return { stayOvernight: !prev.stayOvernight };
               })
             }
           />
@@ -266,7 +253,9 @@ const Search = () => {
         {end && <HotelIcon fontSize="large" className={bedColor} />}
       </div>
 
-      <AddStopButton onClick={handleSubmit}>{buttonText}</AddStopButton>
+      <AddStopButton onClick={handleSubmit} disabled={!end}>
+        {buttonText}
+      </AddStopButton>
     </Wrapper>
   );
 };

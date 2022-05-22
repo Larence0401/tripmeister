@@ -2,6 +2,8 @@ import React from "react";
 import tw from "tailwind-styled-components";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
+//This component brings up the address data of an accommodation
+
 const HotelDetails = ({ address, district }) => {
   return (
     <Container>
