@@ -6,11 +6,11 @@ import {
   FacebookLoginButton,
   GoogleLoginButton,
 } from "react-social-login-buttons";
-import { loginWithGoogle, loginWithFacebook, useAuth } from "../firebase";
+import { loginWithGoogle, loginWithFacebook } from "../firebase";
 import { useRouter } from "next/router";
 
 const login = () => {
-  const user = useAuth();
+
   const router = useRouter();
   const [redirect, setRedirect] = useState(false)
 

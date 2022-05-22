@@ -19,13 +19,13 @@ import {
 } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCslMeCOzjhzgJlzG6mMD-kWb3nfbEDtLs",
-  authDomain: "tripmeister-663c5.firebaseapp.com",
-  projectId: "tripmeister-663c5",
-  storageBucket: "tripmeister-663c5.appspot.com",
-  messagingSenderId: "227535778820",
-  appId: "1:227535778820:web:731228e9d27ea71fde3151",
-  measurementId: "G-VQ08YBQF9Y",
+  apiKey: process.env.apiKey,
+  authDomain: process.env.authDomain,
+  projectId: process.env.projectId,
+  storageBucket: process.env.storageBucket,
+  messagingSenderId: process.env.messagingSenderId,
+  appId: process.env.appId,
+  measurementId: process.env.measurementId,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -69,7 +69,7 @@ let uid = "";
 const colRef = collection(db, "users");
 
 const createUser = async (user) => {
-  console.log(db)
+  console.log(db);
   const userExists = await checkIfUserExists(user.uid);
   if (userExists) return;
   await setDoc(doc(db, "users", user.uid), { name: user.displayName });
