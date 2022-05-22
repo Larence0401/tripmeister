@@ -7,7 +7,7 @@ import {
   GoogleLoginButton,
 } from "react-social-login-buttons";
 import { loginWithGoogle, loginWithFacebook } from "../firebase";
-import { useRouter } from "next/router";
+import { UseRouter } from "next/router";
 
 const login = () => {
 
