@@ -48,7 +48,7 @@ const ActivityList = ({ activities }) => {
     activities.length > 0
       ? activities.map((el, i) =>
           isSelected !== i ? (
-            <ListItem className={`${listItemStyle} cursor-pointer`} key={id}>
+            <ListItem className={`${listItemStyle} cursor-pointer`} key={i}>
               <Activity>{`- ${el.activity}`}</Activity>
               <Time>{el.timeVal}</Time>
               <div>
