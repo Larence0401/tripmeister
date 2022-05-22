@@ -33,6 +33,7 @@ const SaveTrip = () => {
     );
 
   const textFieldRef = useRef();
+  const saveIcon = document.getElementById("save_icon");
 
   const handleKeyDown = async (e) => {
     e.key === "Enter" && tripnameInput && tripnameInput.length > 3
@@ -111,8 +112,8 @@ const SaveTrip = () => {
   };
 
   const showSaveFeedback = () => {
-    const saveIcon = document.getElementById("save_icon");
     const checkIcon = document.getElementById("check_icon");
+    const saveIcon = document.getElementById("save_icon");
     saveIcon.style.display = "none";
     checkIcon.style.display = "flex";
     setTimeout(() => {
@@ -130,7 +131,6 @@ const SaveTrip = () => {
   }, [state.tripName]);
 
   useEffect(() => {
-    console.log(state.uploadRequested);
     if (state.uploadRequested) textFieldRef.current.focus();
   }, [state.uploadRequested]);
 
@@ -145,7 +145,10 @@ const SaveTrip = () => {
               onClick={() => handleClickonSaveBtn()}
             >
               <SaveIcon id="save_icon" className="text-white" />
-              <CheckIcon id="check_icon" className="hidden text-white" />
+              <CheckIcon
+                id="check_icon"
+                className="text-white isHidden"
+              />
             </IconContainer>
           ) : (
             <TextField

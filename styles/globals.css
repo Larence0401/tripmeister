@@ -25,6 +25,10 @@ a {
   font-style: italic;
 }
 
+.isHidden {
+  display: none;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
