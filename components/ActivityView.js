@@ -41,9 +41,9 @@ const ActivityView = () => {
       {endList.length > 0 && (
         <Container>
           <Header>{`Activities in ${end}`}</Header>
-          {endList.map((el) => {
+          {endList.map((el,i) => {
             return (
-              <ListItem>
+              <ListItem key={i + .5}>
                 <Activity>{`- ${el.activity}`}</Activity>
                 <Time>{el.timeVal}</Time>
               </ListItem>
