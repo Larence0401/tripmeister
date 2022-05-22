@@ -2,7 +2,7 @@ import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import getStartingLocation from "../utils/getStartingLocation";
 import getEndLocation from "../utils/getEndLocation";
-import filterByLocation from "../utils/filterByLocation"
+import filterByLocation from "../utils/filterByLocation";
 
 // this component lists the activities for a trip that had already been saved to the database. This component renders if the user is in watch mode.
 
@@ -16,21 +16,21 @@ const ActivityView = () => {
     ? "translate-x-[250px] duration-300 ease-in-out"
     : "-translate-x-0 duration-300 ease-in-out";
 
-  const startList = filterByLocation(activities,start);
-  const endList = filterByLocation(activities,end);
-  startList.sort((a,b) => a.timeVal - b.timeVal).reverse()
-  endList.sort((a,b) => a.timeVal - b.timeVal).reverse()
-  const noActivities = startList.length === 0 && endList.length === 0 ? true : false
-
+  const startList = filterByLocation(activities, start);
+  const endList = filterByLocation(activities, end);
+  startList.sort((a, b) => a.timeVal - b.timeVal).reverse();
+  endList.sort((a, b) => a.timeVal - b.timeVal).reverse();
+  const noActivities =
+    startList.length === 0 && endList.length === 0 ? true : false;
 
   return (
     <Wrapper className={slideIn}>
       {startList.length > 0 && (
         <Container>
           <Header>{`Activities in ${start}`}</Header>
-          {startList.map((el) => {
+          {startList.map((el, i) => {
             return (
-              <ListItem>
+              <ListItem key={i}>
                 <Activity>{`- ${el.activity}`}</Activity>
                 <Time>{el.timeVal}</Time>
               </ListItem>
@@ -51,7 +51,9 @@ const ActivityView = () => {
           })}
         </Container>
       )}
-      {noActivities && <h2 className="italic text-blue-600">No activities yet ...</h2>}
+      {noActivities && (
+        <h2 className="italic text-blue-600">No activities yet ...</h2>
+      )}
     </Wrapper>
   );
 };
