@@ -45,7 +45,7 @@ const Login = () => {
   );
 };
 
-export default login;
+export default Login;
 
 const Wrapper = tw.div`
     flex
