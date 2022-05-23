@@ -34,6 +34,7 @@ const SaveTrip = () => {
 
   const textFieldRef = useRef();
   const saveIcon = document.getElementById("save_icon");
+  const saveIconElement = <SaveIcon id="save_icon" className="text-white" />
 
   const handleKeyDown = async (e) => {
     e.key === "Enter" && tripnameInput && tripnameInput.length > 3
@@ -119,6 +120,7 @@ const SaveTrip = () => {
     setTimeout(() => {
       saveIcon.style.display = "flex";
       checkIcon.style.display = "none";
+      saveIconElement = <SaveIcon id="save_icon" className="text-white" />
     }, 800);
   };
 
@@ -145,10 +147,7 @@ const SaveTrip = () => {
               onClick={() => handleClickonSaveBtn()}
             >
               <SaveIcon id="save_icon" className="text-white" />
-              <CheckIcon
-                id="check_icon"
-                className="text-white isHidden"
-              />
+              <CheckIcon id="check_icon" className="text-white !hidden"/>
             </IconContainer>
           ) : (
             <TextField
