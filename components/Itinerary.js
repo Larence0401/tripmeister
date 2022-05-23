@@ -42,7 +42,7 @@ const Itinerary = () => {
         />
       </div>
       {state.itinerary.length > 0 && !state.editView && !state.readingMode && (
-        <SaveTrip />
+        <SaveTrip/>
       )}
       {state.deleteView ? (
         <DeleteStop listItem={listItem} />
@@ -67,8 +67,10 @@ export default Itinerary;
 const Wrapper = tw.div`
     bg-white
     relative
-    p-8
-    mt-4
+    p-4
+    md:p-8
+    mt-0
+    md:mt-4
     flex
     flex-col
     items-center
@@ -82,7 +84,8 @@ const Wrapper = tw.div`
 
 const ListContainer = tw.div`
     w-full
-    pt-8
+    pt-0
+    md:pt-8
     lg:pt-0
 `;
 

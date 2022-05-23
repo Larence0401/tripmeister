@@ -57,7 +57,7 @@ const Wrapper = tw.div`
 const FormContainer = tw.div`
     absolute
     top-1/4
-    left-[37.5%]
+    lg:left-[37.5%]
     rounded-lg
     shadow-md
     box-border
@@ -73,5 +73,7 @@ const FormContainer = tw.div`
     ml-8
     p-8
     h-auto
-    lg:z-50
-    w-1/4`;
+    z-50
+    w-5/6
+    md:w-1/2
+    lg:w-1/4`;

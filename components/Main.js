@@ -21,6 +21,7 @@ export default Main;
 
 const Wrapper = tw.div`
     bg-slate-200
+    p-4
     p-8
     lg:p-0
     lg:pt-12
@@ -35,8 +36,9 @@ const Wrapper = tw.div`
 const Headline = tw.h2`
     lg:hidden
     px-8
-    pt-8
-    text-lg
+    pt-6
+    md:pt-8
+    lg:text-lg
     text-slate-800
     uppercase
     italic

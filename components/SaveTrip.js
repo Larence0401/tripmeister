@@ -221,9 +221,13 @@ const SaveButton = tw.div`
     shadow-lg
     text-center
     box-border
-    leading-10
+    leading-8
+    md:leading-10
     left-0
-    ml-8
+    ml-4
+    md:ml-8
+    mt-6
+    md:mt-0
     px-3
     text-lg
     uppercase

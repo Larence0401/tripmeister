@@ -212,8 +212,11 @@ const Wrapper = tw.div`
     relative
     w-full
     h-full
-    mt-4
+    mt-0
+    md:mt-4
     lg:mt-0
     mx-8
     lg:mx-0
+    rounded-lg
+    overflow-hidden
     `;

@@ -65,7 +65,7 @@ export default function Home() {
         <Container>
           {!state.readingMode && (
             <>
-              {state.editViewType === "directions" && <Search />}
+              {state.editViewType === "directions" && <Search className="z-50"/>}
               {state.editViewType === "hotel" && <Hotel id="hotel" />}
               {state.editViewType === "notes" && <EditNotes id="notes" />}
               {state.editViewType === "info" && <TripStats id="stats" />}

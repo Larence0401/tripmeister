@@ -6,7 +6,7 @@ const ToggleIcon = () => {
     const {state,dispatch} = useAppContext()
     const isVisible = state.sidebarIsOpen ? "opacity-0" : null
     const isSkewed = state.sidebarIsOpen ? "rotate-[135deg] mt-[8px]" : null
-    const isSkewed2 = state.sidebarIsOpen ? "-rotate-[135deg] -mt-[10px]" : null
+    const isSkewed2 = state.sidebarIsOpen ? "-rotate-[135deg] -mt-[9px]" : null
     
   
   return (

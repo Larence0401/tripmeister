@@ -3,6 +3,7 @@ import tw from "tailwind-styled-components";
 import ToggleIcon from "../components/ToggleIcon";
 import { useAppContext } from "../store/appContext";
 
+
 const Header = () => {
   const { state } = useAppContext();
   return (
@@ -29,6 +30,7 @@ const Wrapper = tw.div`
     fixed
     top-0
     left-0
+    mb-8
 `;
 
 const TripName = tw.div`

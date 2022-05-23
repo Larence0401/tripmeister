@@ -92,6 +92,8 @@ const Container = tw.div`
     flex
     w-full
     justify-around
+    mb-4
+    md:mb-0
     `;
 
 const IconContainer = tw.div`

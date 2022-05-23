@@ -82,10 +82,13 @@ const ItineraryItem = ({ item, index }) => {
 export default ItineraryItem;
 
 const Wrapper = tw.div`
+    text-sm
+    md:text-base
     bg-white
     border-b
     border-slate-300
-    py-4
+    py-2
+    md:py-4
     px-2
     flex
     w-full
@@ -95,7 +98,7 @@ const Route = tw.div`
 flex-1
 `;
 const Date = tw.div`
-w-1/3
+w-1/4
 `;
 
 const Icons = tw.div`

@@ -145,7 +145,8 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
 export default HotelSuggestions;
 
 const ListContainer = tw.div`
-mt-4
+mt-0
+md:mt-4
 w-full
 `;
 
@@ -158,11 +159,15 @@ font-semibold
 `;
 
 const HeaderCol1 = tw.div`
+text-sm
+md_text-base
 w-2/3
 truncate
 `;
 
 const HeaderCol2 = tw.div`
+text-sm
+md_text-base
 w-1/3
 `;
 

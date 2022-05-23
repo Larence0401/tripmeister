@@ -219,10 +219,10 @@ const Search = () => {
       {focus === "end" && state.endValue.length > 2 && !end && (
         <AutocompleteList setEnd={setEnd} />
       )}
-      <div className="flex w-full items-center mb-8 justify-between">
+      <div className="flex w-full items-center mb-4 hover:mb-8 justify-between">
         <DatePickerContainer className={dateInput}>
           <DatePicker
-            className="w-3/4"
+            className="w-3/4 z-50"
             selected={newDate}
             onChange={(date) => setNewDate(date)}
             showTimeSelect
@@ -263,6 +263,7 @@ const Search = () => {
 export default Search;
 
 const Wrapper = tw.div`
+    z-50
     rounded-lg
     shadow-md
     box-border
@@ -270,27 +271,32 @@ const Wrapper = tw.div`
     flex-col
     items-center
     bg-white
-    m-8
+    m-4
+    md:m-8
     mx-0
     lg:m-0
     lg:mb-4
     lg-mt-8
     mb-4
-    p-8
+    p-4
+    md:p-8
     h-auto
     lg:z-10
     w-full`;
 
 const DestinationInput = tw.input`
     rounded-sm
-    leading-10
+    leading-8
+    md:leading-10
     uppercase
     border
     border-slate-300
     box-border
-    mb-4
+    mb-2
+    md:mb-4
     px-2
-    py-1
+    py-0
+    md:py-1
     w-full`;
 
 const DatePickerContainer = tw.div`
@@ -300,10 +306,12 @@ const DatePickerContainer = tw.div`
     border-slate-300
     self-start
     box-border
-    leading-10
+    leading-8
+    md:leading-10
     px-2
     pr-2
-    py-1
+    py-0
+    md:py-1
 `;
 
 const AddStopButton = tw.button`
@@ -311,11 +319,13 @@ const AddStopButton = tw.button`
     bg-slate-600
     shadow-md
     box-border
-    leading-10
+    leading-8
+    md:leading-10
     px-2
     py-1
     text-slate-100
-    text-2xl
+    text-xl
+    md:text-2xl
     uppercase
     align-center
   
@@ -343,10 +353,12 @@ const ListItem = tw.li`
 const LastStop = tw.div`
 rounded-sm
 font-semibold
-leading-10
+leading-8
+md:leading-10
 uppercase
 box-border
-mb-4
+mb-2
+md:mb-4
 px-2
 w-full
 `;
