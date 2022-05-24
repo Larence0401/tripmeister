@@ -115,12 +115,11 @@ const SaveTrip = () => {
   const showSaveFeedback = () => {
     const checkIcon = document.getElementById("check_icon");
     const saveIcon = document.getElementById("save_icon");
-    saveIcon.style.display = "none";
-    checkIcon.style.display = "flex";
+    saveIcon.classList.add("!hidden")
+    checkIcon.classList.remove("!hidden")
     setTimeout(() => {
-      saveIcon.style.display = "flex";
-      checkIcon.style.display = "none";
-      saveIconElement = <SaveIcon id="save_icon" className="text-white" />
+      saveIcon.classList.remove("!hidden")
+      checkIcon.classList.add("!hidden")
     }, 800);
   };
 

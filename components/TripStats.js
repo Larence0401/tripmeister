@@ -107,7 +107,8 @@ const Wrapper = tw.div`
     const Header = tw.div`
     w-full
     rounded-md
-    text-lg
+    text-base
+    lg:text-lg
     font-semibold
     bg-slate-600
     text-slate-50
