@@ -13,7 +13,7 @@ const HotelView = () => {
   const hotelName = address
     ? state?.selectedStopData?.[3]?.text
     : "no hotel selected";
-  const noSelect = address ? "" : "italic font-normal text-red-600";
+  const noSelect = address ? "" : "italic font-normal text-blue-600";
 
   const getAddress = () => {
     const string = state?.selectedStopData?.[3]?.place_name;

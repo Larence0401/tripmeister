@@ -13,6 +13,9 @@ const CreateNewTrip = () => {
     dispatch({ type: "setEditView", payload: false });
     dispatch({ type: "updateRouteData", payload: [] });
     dispatch({ type: "setEditViewType", payload: "directions" });
+    dispatch({ type: "setTripName", payload: null });
+    dispatch({ type: "setTripID", payload: null });
+    
   };
 
   return (

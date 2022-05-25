@@ -92,9 +92,9 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
         )}
 
         {hotelData.length < 1 && (
-          <p className="italic text-red-500">{`No ${accommodationType}s in ${location}!`}</p>
+          <p className="italic red-blue-500">{`No ${accommodationType}s in ${location}!`}</p>
         )}
-        {sortedFeatures &&
+        {sortedFeatures && hotelData.length >= 1 &&
           sortedFeatures.map((el, i) => (
             <>
               <Row

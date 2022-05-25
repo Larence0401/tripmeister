@@ -222,6 +222,7 @@ const Search = () => {
       <div className="flex w-full items-center mb-4 hover:mb-8 justify-between">
         <DatePickerContainer className={dateInput}>
           <DatePicker
+            portalId="root-portal"
             className="w-3/4 z-50"
             selected={newDate}
             onChange={(date) => setNewDate(date)}

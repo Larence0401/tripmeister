@@ -16,14 +16,17 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import useGetTripData from "../hooks/useGetTripData";
 
 const SaveTrip = () => {
   const { state, dispatch } = useAppContext();
+  const [trip, getTripData] = useGetTripData();
   const [tripnameInput, setTripnameInput] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
   const user = useAuth();
   const checkIcon =
-    tripnameInput && tripnameInput.length < 4 ? (
+    (tripnameInput && tripnameInput.length < 4) || errorMsg !== "" ? (
       ""
     ) : (
       <CheckIcon
@@ -33,8 +36,6 @@ const SaveTrip = () => {
     );
 
   const textFieldRef = useRef();
-  const saveIcon = document.getElementById("save_icon");
-  const saveIconElement = <SaveIcon id="save_icon" className="text-white" />
 
   const handleKeyDown = async (e) => {
     e.key === "Enter" && tripnameInput && tripnameInput.length > 3
@@ -54,6 +55,13 @@ const SaveTrip = () => {
       tripname: tripnameInput,
       data: JSON.stringify(state.itinerary),
     });
+  };
+
+  const checkIfTripNameIsTaken = () => {
+    if (!tripnameInput || !trip) return;
+    trip.some((el) => el.tripName === tripnameInput)
+      ? setErrorMsg("trip name is already taken!")
+      : setErrorMsg("");
   };
 
   const handleClickonSaveBtn = async () => {
@@ -113,13 +121,13 @@ const SaveTrip = () => {
   };
 
   const showSaveFeedback = () => {
-    const checkIcon = document.getElementById("check_icon");
-    const saveIcon = document.getElementById("save_icon");
-    saveIcon.classList.add("!hidden")
-    checkIcon.classList.remove("!hidden")
+    const checkIconEl = document.getElementById("check_icon");
+    const saveIconEl = document.getElementById("save_icon");
+    saveIconEl.classList.add("!hidden");
+    checkIconEl.classList.remove("!hidden");
     setTimeout(() => {
-      saveIcon.classList.remove("!hidden")
-      checkIcon.classList.add("!hidden")
+      saveIconEl.classList.remove("!hidden");
+      checkIconEl.classList.add("!hidden");
     }, 800);
   };
 
@@ -135,6 +143,15 @@ const SaveTrip = () => {
     if (state.uploadRequested) textFieldRef.current.focus();
   }, [state.uploadRequested]);
 
+  useEffect(() => {
+    (async () => await getTripData())();
+  }, [user]);
+
+  useEffect(() => {
+    if (!trip) return;
+    checkIfTripNameIsTaken();
+  }, [tripnameInput]);
+
   return (
     <>
       {state.editView ? (
@@ -146,7 +163,7 @@ const SaveTrip = () => {
               onClick={() => handleClickonSaveBtn()}
             >
               <SaveIcon id="save_icon" className="text-white" />
-              <CheckIcon id="check_icon" className="text-white !hidden"/>
+              <CheckIcon id="check_icon" className="text-white !hidden" />
             </IconContainer>
           ) : (
             <TextField
@@ -190,6 +207,7 @@ const SaveTrip = () => {
           )}
         </>
       )}
+      <p className="self-start pl-2 italic text-red-500">{errorMsg}</p>
     </>
   );
 };
