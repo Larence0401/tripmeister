@@ -100,6 +100,11 @@ const MapComponent = () => {
     return newMinLong;
   };
 
+
+  const mapFeatures = (feature) => {
+
+  }
+
   useEffect(() => {
     if (state.itinerary.length === 0) return;
     getRoute();
@@ -159,15 +164,19 @@ const MapComponent = () => {
         ))
       : null;
 
+
+
   return (
     <Wrapper>
       <Map
         className="relative"
+        id="map"
         ref={mapRef}
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxAccessToken={process.env.mapbox_key}
         {...viewstate}
         onMove={(e) => setViewState(e.viewState)}
+        onViewportchange = {(e) => setViewState(e.viewState)}
       >
         {zoomedOut ? (
           <ZoomInMapIcon
