@@ -1,6 +1,7 @@
 import React from "react";
 import tw from "tailwind-styled-components";
 import ToggleIcon from "../components/ToggleIcon";
+import ToggleIcon2 from "./ToggleIcon2";
 import { useAppContext } from "../store/appContext";
 
 
@@ -8,7 +9,7 @@ const Header = () => {
   const { state } = useAppContext();
   return (
     <Wrapper>
-      <ToggleIcon />
+      <ToggleIcon2 />
       {state.tripName && (
         <TripName>{state.tripName}</TripName>
       )}
@@ -31,6 +32,8 @@ const Wrapper = tw.div`
     top-0
     left-0
     mb-8
+    items-center
+    pl-2
 `;
 
 const TripName = tw.div`

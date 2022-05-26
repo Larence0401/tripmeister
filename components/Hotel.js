@@ -92,7 +92,6 @@ const Wrapper = tw.div`
     flex-col
     items-start
     bg-white
-    max-h-[50%]
     overflow-y-scroll
     m-8
     mx-0
