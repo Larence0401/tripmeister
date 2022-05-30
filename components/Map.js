@@ -6,12 +6,14 @@ import ZoomInMapIcon from "@mui/icons-material/ZoomInMap";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import MapIcon from "@mui/icons-material/Map";
+import useMapFeatures from "../hooks/useMapFeatures";
+import useSortFeaturesByDistance from "../hooks/useSortFeaturesByDistance";
 
 const MapComponent = () => {
   const { state, dispatch } = useAppContext();
   const [zoomedOut, setZoomedOut] = useState(false);
-  const [isListView, setIsListView] = useState(false);
   const mapRef = useRef();
+  const [features, mapFeatures] = useMapFeatures();
 
   const getMarkers = (no) => {
     if (state.itinerary?.length < 1) return;
@@ -21,10 +23,6 @@ const MapComponent = () => {
         : state?.selectedStopData?.[no - 1]?.coordinates;
     return coords;
   };
-
-  state.itinerary?.length < 1
-    ? null
-    : console.log(state.itinerary[state.itinerary.length - 1][0].coordinates);
 
   const marker1 = getMarkers(1);
   const marker2 = getMarkers(2);
@@ -63,16 +61,23 @@ const MapComponent = () => {
   const getCoordinates = (type) => {
     if (state.itinerary.length < 1) return;
     const index = type === "lat" ? 1 : 0;
-    const arr = [...state.itinerary];
+    const arr =
+      state.editViewType === "hotel"
+        ? [...state.hotelData]
+        : state.editViewType === "restaurants"
+        ? [...state.restaurantsData]
+        : [...state.itinerary];
+
     const array = [];
-    let coordinates_array = arr.map((stage) => [
-      ...array,
-      stage[1]["coordinates"][index],
-    ]);
-    coordinates_array = [
-      ...coordinates_array,
-      [state.itinerary[0][0]["coordinates"][index]],
-    ];
+    let coordinates_array = arr.map((el) => {
+      return state.editViewType !== ("hotel" || "restaurants")
+        ? [...array, el[1]["coordinates"][index]]
+        : [...array, el.center[index]];
+    });
+    coordinates_array =
+      state.editViewType !== ("hotel" || "restaurants")
+        ? [...coordinates_array, [state.itinerary[0][0]["coordinates"][index]]]
+        : coordinates_array;
     return coordinates_array;
   };
 
@@ -100,22 +105,28 @@ const MapComponent = () => {
     return newMinLong;
   };
 
-
-  const mapFeatures = (feature) => {
-
-  }
-
   useEffect(() => {
+    if (state.editViewType === "hotel" && state.hotelData.length < 1) return;
     if (state.itinerary.length === 0) return;
     getRoute();
     const phantomMarkers = modifyFitBounds();
     const markerPair =
       window.innerWidth >= 1024 ? phantomMarkers : [marker1, marker2];
     const fitBounds =
-      zoomedOut && state.itinerary.length > 0 ? getFitBounds() : markerPair;
+      (zoomedOut && state.itinerary.length > 0) ||
+      state.editViewType === "hotel" ||
+      state.editViewType === "restaurants"
+        ? getFitBounds()
+        : markerPair;
     mapRef.current?.fitBounds(fitBounds, { padding: 60 });
     modifyFitBounds();
-  }, [state.itinerary, zoomedOut, state.selectedStopData]);
+  }, [
+    state.itinerary,
+    zoomedOut,
+    state.selectedStopData,
+    state.editViewType,
+    state.hotelData,
+  ]);
 
   const StartMarkerProps = {
     color: "#000000",
@@ -164,7 +175,9 @@ const MapComponent = () => {
         ))
       : null;
 
-
+  useEffect(() => {
+    mapFeatures("hotel");
+  }, [state.editViewType, state.mapView, state.hotelData]);
 
   return (
     <Wrapper>
@@ -176,7 +189,7 @@ const MapComponent = () => {
         mapboxAccessToken={process.env.mapbox_key}
         {...viewstate}
         onMove={(e) => setViewState(e.viewState)}
-        onViewportchange = {(e) => setViewState(e.viewState)}
+        onViewportchange={(e) => setViewState(e.viewState)}
       >
         {zoomedOut ? (
           <ZoomInMapIcon
@@ -191,7 +204,7 @@ const MapComponent = () => {
             onClick={() => setZoomedOut(true)}
           />
         )}
-        {!isListView ? (
+        {state.mapView ? (
           <div className="lg:hidden">
             <ViewListIcon
               className="absolute right-0 m-4 text-slate-900"
@@ -209,6 +222,7 @@ const MapComponent = () => {
         {state.itinerary.length > 0 && <Marker {...StartMarkerProps} />}
         {markers}
         {routes}
+        {features}
       </Map>
     </Wrapper>
   );

@@ -29,7 +29,9 @@ export const ContextProvider = ({ children }) => {
     tripnameInput: false,
     readingMode: false,
     uploadRequested: false,
-    downloadUrls: []
+    downloadUrls: [],
+    hotelData: [],
+    sortedFeatures: []
   };
 
   const reducer = (state, action) => {
@@ -225,6 +227,18 @@ export const ContextProvider = ({ children }) => {
         return {
           ...state,
           downloadUrls: action.payload
+        }
+      }
+      case "setHotelData": {
+        return {
+          ...state,
+          hotelData: action.payload
+        }
+      }
+      case "setSortedFeatures": {
+        return {
+          ...state,
+          sortedFeatures: action.payload
         }
       }
       default:

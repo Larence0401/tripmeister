@@ -11,6 +11,7 @@ import HotelDetails from "./HotelDetails";
 import useUpdateHotel from "../hooks/useUpdateHotel";
 import useGetDistanceToCityCenter from "../hooks/useGetDistanceToCityCenter";
 import useSortFeaturesByDistance from "../hooks/useSortFeaturesByDistance";
+import getColors from "../utils/getColors";
 
 const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   const { state, dispatch } = useAppContext();
@@ -24,6 +25,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   const uneven = "bg-[rgb(247,247,247)]";
   const location = getEndLocation(state.selectedStopData);
   const active = "bg-slate-600 text-slate-100";
+  const colors = getColors();
 
   const updateHotel = useUpdateHotel(hotelData?.[index]);
   const [distance, getDistanceToCityCenter] =
@@ -50,8 +52,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   }, [index]);
 
   useEffect(() => {
-    if (hotelData?.length === 0) return;
-    console.log(hotelData)
+    if (state.ArrowDropDownIconhotelData?.length === 0) return;
     getDistanceToCityCenter(hotelData);
   }, [hotelData]);
 
@@ -59,17 +60,18 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
     (async () => {
       const hotelData = await getHotels(accommodationType, coords);
       setHotelData(hotelData);
+      dispatch({ type: "setHotelData", payload: hotelData });
     })();
   }, [accommodationType, state.selectedStopData]);
 
   useEffect(() => {
-    if(distance) console.log(distance)
+    if (distance) console.log(distance);
     sortFeaturesByDistance(distance, hotelData);
   }, [distance]);
 
   useEffect(() => {
-      if(sortedFeatures) console.log(sortedFeatures)
-  },[sortedFeatures])
+    if (sortedFeatures) console.log(sortedFeatures);
+  }, [sortedFeatures]);
 
   return (
     <>
@@ -84,17 +86,18 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
         </Select>
       </FormControl>
       <ListContainer>
-        {hotelData.length > 0 && (
+        {hotelData?.length > 0 && (
           <Header>
             <HeaderCol1>{`${accommodationType}s in ${location}`}</HeaderCol1>
             <HeaderCol2>distance to town center</HeaderCol2>
           </Header>
         )}
 
-        {hotelData.length < 1 && (
+        {hotelData?.length < 1 && (
           <p className="italic red-blue-500">{`No ${accommodationType}s in ${location}!`}</p>
         )}
-        {sortedFeatures && hotelData.length >= 1 &&
+        {sortedFeatures &&
+          hotelData.length >= 1 &&
           sortedFeatures.map((el, i) => (
             <>
               <Row
@@ -105,7 +108,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
                 key={i}
               >
                 <ListCol1>
-                  {hotelData.length > 0 && getHotelName(el.data)}
+                  {hotelData?.length > 0 && getHotelName(el.data)}
                 </ListCol1>
                 <ListCol2>{el.distance}</ListCol2>
                 <ListCol3>
@@ -114,11 +117,13 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
                       <ArrowDropUpIcon
                         onClick={() => setDetailsShown(null)}
                         fontSize="medium"
+                        style={{color: colors[i]}}
                       />
                     ) : (
                       <ArrowDropDownIcon
                         onClick={() => setDetailsShown(i)}
-                        fontSize="medium"
+                        fontSize="large"
+                        style={{color: colors[i]}}
                       />
                     )}
                   </Icon>
@@ -181,6 +186,12 @@ p-2
 text-sm
 items-center
 cursor-pointer
+`;
+
+const RowColor = tw.div`
+bg-red-500
+w-8
+rounded-full
 `;
 
 const ListCol1 = tw.div`
