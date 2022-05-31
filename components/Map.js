@@ -8,10 +8,12 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import MapIcon from "@mui/icons-material/Map";
 import useMapFeatures from "../hooks/useMapFeatures";
 import useSortFeaturesByDistance from "../hooks/useSortFeaturesByDistance";
+import getColors from "../utils/getColors"
 
 const MapComponent = () => {
   const { state, dispatch } = useAppContext();
   const [zoomedOut, setZoomedOut] = useState(false);
+  const [hotelSelected, setHotelSelected] = useState(false);
   const mapRef = useRef();
   const [features, mapFeatures] = useMapFeatures();
 
@@ -26,6 +28,12 @@ const MapComponent = () => {
 
   const marker1 = getMarkers(1);
   const marker2 = getMarkers(2);
+
+  console.log(hotelSelected);
+  console.log(state?.selectedStopData);
+  console.log(state?.selectedStopData?.[3]?.center);
+  const index = state?.selectedStopData?.[6]?.["index"];
+  console.log(state?.itinerary?.[index]?.[3]);
 
   const [viewstate, setViewState] = useState({
     latitude: "52.5200",
@@ -65,24 +73,25 @@ const MapComponent = () => {
       state.editViewType === "hotel"
         ? [...state.hotelData]
         : state.editViewType === "restaurants"
-        ? [...state.restaurantsData]
+        ? [...state.restaurantData]
         : [...state.itinerary];
 
     const array = [];
     let coordinates_array = arr.map((el) => {
-      return state.editViewType !== ("hotel" || "restaurants")
+      return state.editViewType !== "hotel" &&
+        state.editViewType !== "restaurants"
         ? [...array, el[1]["coordinates"][index]]
         : [...array, el.center[index]];
     });
     coordinates_array =
-      state.editViewType !== ("hotel" || "restaurants")
+      state.editViewType !== "hotel" && state.editViewType !== "restaurants"
         ? [...coordinates_array, [state.itinerary[0][0]["coordinates"][index]]]
         : coordinates_array;
     return coordinates_array;
   };
 
   const getFitBounds = () => {
-    if (state.itinerary.length < 1) return;
+    if (state.itinerary.length < 1 || hotelSelected) return;
     const latitudes_array = getCoordinates("lat");
     const longitudes_array = getCoordinates("long");
     const minLat = latitudes_array.sort()[0];
@@ -105,8 +114,17 @@ const MapComponent = () => {
     return newMinLong;
   };
 
+  const checkIfHotelSelected = () => {
+    const index = state?.selectedStopData?.[6]?.["index"];
+    state?.itinerary?.[index]?.[3]?.id
+      ? setHotelSelected(true)
+      : setHotelSelected(false);
+  };
+
   useEffect(() => {
     if (state.editViewType === "hotel" && state.hotelData.length < 1) return;
+    if (state.editViewType === "restaurants" && state.restaurantData.length < 1)
+      return;
     if (state.itinerary.length === 0) return;
     getRoute();
     const phantomMarkers = modifyFitBounds();
@@ -120,12 +138,15 @@ const MapComponent = () => {
         : markerPair;
     mapRef.current?.fitBounds(fitBounds, { padding: 60 });
     modifyFitBounds();
+    checkIfHotelSelected();
+    console.log(hotelSelected);
   }, [
     state.itinerary,
     zoomedOut,
     state.selectedStopData,
     state.editViewType,
     state.hotelData,
+    state.restaurantData,
   ]);
 
   const StartMarkerProps = {
@@ -147,6 +168,20 @@ const MapComponent = () => {
       const markers2 = [marker1, phantomMarker2];
       return markers2;
     }
+  };
+
+  const mapSelectedHotel = () => {
+    const index = state?.selectedStopData?.[6]?.["index"];
+    const lon = state?.itinerary?.[index]?.[3]?.center?.[0]
+    const lat = state?.itinerary?.[index]?.[3]?.center?.[1]
+    const colors = getColors()
+    return (
+      <Marker
+        color={colors[0]}
+        longitude={lon}
+        latitude={lat}
+      />
+    );
   };
 
   const markers =
@@ -175,9 +210,12 @@ const MapComponent = () => {
         ))
       : null;
 
+  console.log(state.sortedFeatures);
+
   useEffect(() => {
-    mapFeatures("hotel");
-  }, [state.editViewType, state.mapView, state.hotelData]);
+    if (!state.sortedFeatures || state.sortedFeatures.length < 1) return;
+    mapFeatures(hotelSelected);
+  }, [state.editViewType, state.mapView, state.sortedFeatures, hotelSelected]);
 
   return (
     <Wrapper>
@@ -223,6 +261,7 @@ const MapComponent = () => {
         {markers}
         {routes}
         {features}
+        {hotelSelected && mapSelectedHotel()}
       </Map>
     </Wrapper>
   );

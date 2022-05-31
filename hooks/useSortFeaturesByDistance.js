@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { useAppContext } from "../store/appContext";
 
 const useSortFeaturesByDistance = () => {
   const [sortedFeatures, setSortedFeatures] = useState();
-
+  const { state, dispatch } = useAppContext();
   const getIndex = (parsedArr) => {
     let arr = Array.from(new Set(parsedArr));
     let indices = arr.map((el) => {
@@ -18,10 +19,16 @@ const useSortFeaturesByDistance = () => {
 
   const sortFeaturesByDistance = (distance, featureData) => {
     if (!distance && featureData) return;
-    const parsedArr = distance.map((el) => {
+    const distanceInKm = distance.map(el => {
+      return (el.split(" ")[1] === "m" ? `${JSON.stringify(parseInt(el)/1000)} km` : el)
+      
+    })
+
+    const parsedArr = distanceInKm.map((el) => {
       const num = parseFloat(el.split(" ")[0]);
       return num;
     });
+    console.log(parsedArr)
     let sortedArr = JSON.parse(JSON.stringify(parsedArr));
     sortedArr = sortedArr.sort((a, b) => a - b);
     let arrOfIndices = Array(parsedArr.length).fill(0);
@@ -40,6 +47,7 @@ const useSortFeaturesByDistance = () => {
       return { data: featureData[index], distance: distance[index] };
     });
     setSortedFeatures(sortedFeatures);
+    dispatch({type: 'setSortedFeatures', payload: sortedFeatures})
   };
 
   return [sortedFeatures, sortFeaturesByDistance];

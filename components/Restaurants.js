@@ -9,9 +9,10 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import Icon from "@mui/material/Icon";
 import HotelDetails from "./HotelDetails";
 import useSortFeaturesByDistance from "../hooks/useSortFeaturesByDistance";
+import getColors from "../utils/getColors"
 
 const Restaurants = () => {
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const coords = state?.selectedStopData?.[1]?.["coordinates"];
   const [restaurantData, setRestaurantData] = useState([]);
   const [detailsShown, setDetailsShown] = useState(null);
@@ -22,6 +23,7 @@ const Restaurants = () => {
   const getRestaurantName = (el) => {
     return el?.place_name.split(",")[0];
   };
+  const colors = getColors()
 
   const slideIn = state.sidebarIsOpen
     ? "translate-x-[250px] duration-300 ease-in-out"
@@ -37,9 +39,15 @@ const Restaurants = () => {
   }, [distance]);
 
   useEffect(() => {
+    if(sortedFeatures && sortedFeatures.length < 1) return
+dispatch({ type: "setSortedFeatures", payload: sortedFeatures})
+  },[sortedFeatures]);
+
+  useEffect(() => {
     (async () => {
       const restaurantData = await getHotels("restaurant", coords);
       setRestaurantData(restaurantData);
+      dispatch({ type: "setRestaurantData", payload: restaurantData})
     })();
   }, [state.selectedStopData]);
 
@@ -66,11 +74,13 @@ const Restaurants = () => {
                       <ArrowDropUpIcon
                         onClick={() => setDetailsShown(null)}
                         fontSize="medium"
+                        style={{color: colors[i]}}
                       />
                     ) : (
                       <ArrowDropDownIcon
                         onClick={() => setDetailsShown(i)}
                         fontSize="medium"
+                        style={{color: colors[i]}}
                       />
                     )}
                   </Icon>

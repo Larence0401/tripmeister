@@ -31,6 +31,7 @@ export const ContextProvider = ({ children }) => {
     uploadRequested: false,
     downloadUrls: [],
     hotelData: [],
+    restaurantData: [],
     sortedFeatures: []
   };
 
@@ -233,6 +234,12 @@ export const ContextProvider = ({ children }) => {
         return {
           ...state,
           hotelData: action.payload
+        }
+      }
+      case "setRestaurantData": {
+        return {
+          ...state,
+          restaurantData: action.payload
         }
       }
       case "setSortedFeatures": {
