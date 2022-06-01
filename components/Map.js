@@ -8,7 +8,7 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import MapIcon from "@mui/icons-material/Map";
 import useMapFeatures from "../hooks/useMapFeatures";
 import useSortFeaturesByDistance from "../hooks/useSortFeaturesByDistance";
-import getColors from "../utils/getColors"
+import getColors from "../utils/getColors";
 
 const MapComponent = () => {
   const { state, dispatch } = useAppContext();
@@ -172,16 +172,10 @@ const MapComponent = () => {
 
   const mapSelectedHotel = () => {
     const index = state?.selectedStopData?.[6]?.["index"];
-    const lon = state?.itinerary?.[index]?.[3]?.center?.[0]
-    const lat = state?.itinerary?.[index]?.[3]?.center?.[1]
-    const colors = getColors()
-    return (
-      <Marker
-        color={colors[0]}
-        longitude={lon}
-        latitude={lat}
-      />
-    );
+    const lon = state?.itinerary?.[index]?.[3]?.center?.[0];
+    const lat = state?.itinerary?.[index]?.[3]?.center?.[1];
+    const colors = getColors();
+    return <Marker color={colors[0]} longitude={lon} latitude={lat} />;
   };
 
   const markers =
@@ -260,8 +254,8 @@ const MapComponent = () => {
         {state.itinerary.length > 0 && <Marker {...StartMarkerProps} />}
         {markers}
         {routes}
-        {features}
-        {hotelSelected && mapSelectedHotel()}
+        {!hotelSelected && features}
+        {hotelSelected && state.editViewType === "hotel" && mapSelectedHotel()}
       </Map>
     </Wrapper>
   );

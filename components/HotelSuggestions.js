@@ -231,4 +231,5 @@ const Button = tw.div`
     justify-center
     text-center
     mt-4
+    cursor-pointer
 `;

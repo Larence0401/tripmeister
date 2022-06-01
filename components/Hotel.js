@@ -22,32 +22,39 @@ const Hotel = () => {
   const hotelName = state?.itinerary?.[index]?.[3]?.["text"];
   const address = state?.itinerary?.[index]?.[3]?.["properties"]?.["address"];
   const slideIn = state.sidebarIsOpen
-  ? "translate-x-[250px] duration-300 ease-in-out"
-  : "-translate-x-0 duration-300 ease-in-out";
+    ? "translate-x-[250px] duration-300 ease-in-out"
+    : "-translate-x-0 duration-300 ease-in-out";
 
   const deleteHotel = () => {
-    const arr = state?.itinerary
-    arr?.[index].splice(3,1,{accommodation: "no accommodation selected"})
-    dispatch({type: "updateItinerary", payload: arr})
-  }
+    const arr = state?.itinerary;
+    arr?.[index].splice(3, 1, { accommodation: "no accommodation selected" });
+    dispatch({ type: "updateItinerary", payload: arr });
+  };
 
   return (
     <Wrapper className={slideIn}>
-      {(hotelSelected || (hotelName && !hotelSelected)) && (!isEditMode || !state.editMode) && (
-        <HotelData>
-          <div className="flex flex-col">
-            <HotelName>{hotelName}</HotelName>
-            <Address>
-              <LocationOnIcon className="mr-2" />
-              {address}
-            </Address>
-          </div>
-          <Icons>
-            <EditIcon className="mr-2" onClick={() => setIsEditMode(true)} />
-            <DeleteIcon onClick={() => deleteHotel()}/>
-          </Icons>
-        </HotelData>
-      )}
+      {(hotelSelected || (hotelName && !hotelSelected)) &&
+        (!isEditMode || !state.editMode) && (
+          <HotelData>
+            <div className="flex flex-col">
+              <HotelName>{hotelName}</HotelName>
+              <Address>
+                <LocationOnIcon className="mr-2" />
+                {address}
+              </Address>
+            </div>
+            <Icons>
+              <EditIcon
+                className="mr-2 cursor-pointer text-slate-700 hover:text-slate-900"
+                onClick={() => setIsEditMode(true)}
+              />
+              <DeleteIcon
+                className="cursor-pointer text-slate-700 hover:text-slate-900"
+                onClick={() => deleteHotel()}
+              />
+            </Icons>
+          </HotelData>
+        )}
 
       {((!hotelSelected && !hotelName) || isEditMode) && (
         <SearchSelect>
@@ -70,7 +77,8 @@ const Hotel = () => {
         </SearchSelect>
       )}
 
-      {((!hotelSelected && !isSearch && !hotelName) || (isEditMode && !isSearch)) && (
+      {((!hotelSelected && !isSearch && !hotelName) ||
+        (isEditMode && !isSearch)) && (
         <HotelSuggestions
           setHotelSelected={setHotelSelected}
           setIsEditMode={setIsEditMode}

@@ -56,4 +56,5 @@ py-1
 overflow-hidden
 truncate
 hover:bg-slate-50
+cursor-pointer
 `;
