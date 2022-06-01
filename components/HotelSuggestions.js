@@ -40,7 +40,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
     setHotelSelected(true);
     setIsEditMode(false);
     const arr = [...state.itinerary];
-    const hotel = hotelData[selected];
+   const hotel = sortedFeatures[selected].data
     const index = state.selectedStopData[6]["index"];
     arr[index].splice(3, 1, hotel);
     dispatch({ type: "updateItinerary", payload: arr });
@@ -59,6 +59,7 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   useEffect(() => {
     (async () => {
       const hotelData = await getHotels(accommodationType, coords);
+      console.log(hotelData);
       setHotelData(hotelData);
       dispatch({ type: "setHotelData", payload: hotelData });
     })();

@@ -24,6 +24,7 @@ const Itinerary = () => {
   const handleClick = () => {
     dispatch({ type: "setEditView", payload: false });
     dispatch({ type: "setEditViewType", payload: "directions" });
+    dispatch({type: "selectStop", payload: []})
   };
 
   return (

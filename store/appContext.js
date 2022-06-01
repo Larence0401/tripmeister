@@ -32,7 +32,8 @@ export const ContextProvider = ({ children }) => {
     downloadUrls: [],
     hotelData: [],
     restaurantData: [],
-    sortedFeatures: []
+    sortedFeatures: [],
+    hotelDeleted: false
   };
 
   const reducer = (state, action) => {
@@ -246,6 +247,12 @@ export const ContextProvider = ({ children }) => {
         return {
           ...state,
           sortedFeatures: action.payload
+        }
+      }
+      case "setHotelDeleted": {
+        return {
+          ...state,
+          hotelDeleted: action.payload
         }
       }
       default:

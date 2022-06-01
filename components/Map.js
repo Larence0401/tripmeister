@@ -16,6 +16,7 @@ const MapComponent = () => {
   const [hotelSelected, setHotelSelected] = useState(false);
   const mapRef = useRef();
   const [features, mapFeatures] = useMapFeatures();
+  console.log(hotelSelected);
 
   const getMarkers = (no) => {
     if (state.itinerary?.length < 1) return;
@@ -28,12 +29,6 @@ const MapComponent = () => {
 
   const marker1 = getMarkers(1);
   const marker2 = getMarkers(2);
-
-  console.log(hotelSelected);
-  console.log(state?.selectedStopData);
-  console.log(state?.selectedStopData?.[3]?.center);
-  const index = state?.selectedStopData?.[6]?.["index"];
-  console.log(state?.itinerary?.[index]?.[3]);
 
   const [viewstate, setViewState] = useState({
     latitude: "52.5200",
@@ -70,28 +65,34 @@ const MapComponent = () => {
     if (state.itinerary.length < 1) return;
     const index = type === "lat" ? 1 : 0;
     const arr =
-      state.editViewType === "hotel"
+      state.editViewType === "hotel" && state.editView
         ? [...state.hotelData]
         : state.editViewType === "restaurants"
         ? [...state.restaurantData]
         : [...state.itinerary];
+    console.log(arr);
 
     const array = [];
     let coordinates_array = arr.map((el) => {
-      return state.editViewType !== "hotel" &&
-        state.editViewType !== "restaurants"
+      return (state.editViewType !== "hotel" &&
+        state.editViewType !== "restaurants") ||
+        !state.editView
         ? [...array, el[1]["coordinates"][index]]
         : [...array, el.center[index]];
     });
     coordinates_array =
-      state.editViewType !== "hotel" && state.editViewType !== "restaurants"
+      (state.editViewType !== "hotel" &&
+        state.editViewType !== "restaurants") ||
+      !state.editView
         ? [...coordinates_array, [state.itinerary[0][0]["coordinates"][index]]]
         : coordinates_array;
     return coordinates_array;
   };
 
   const getFitBounds = () => {
-    if (state.itinerary.length < 1 || hotelSelected) return;
+    console.log("getFitbounds");
+    if (state.itinerary.length < 1) return;
+    console.log("getFitbounds after");
     const latitudes_array = getCoordinates("lat");
     const longitudes_array = getCoordinates("long");
     const minLat = latitudes_array.sort()[0];
@@ -136,10 +137,14 @@ const MapComponent = () => {
       state.editViewType === "restaurants"
         ? getFitBounds()
         : markerPair;
+    console.log(phantomMarkers);
+    console.log(fitBounds);
+    console.log(marker1);
+    console.log(marker2);
+    console.log(hotelSelected);
     mapRef.current?.fitBounds(fitBounds, { padding: 60 });
     modifyFitBounds();
     checkIfHotelSelected();
-    console.log(hotelSelected);
   }, [
     state.itinerary,
     zoomedOut,
@@ -147,6 +152,7 @@ const MapComponent = () => {
     state.editViewType,
     state.hotelData,
     state.restaurantData,
+    state.editView,
   ]);
 
   const StartMarkerProps = {
@@ -204,12 +210,18 @@ const MapComponent = () => {
         ))
       : null;
 
-  console.log(state.sortedFeatures);
-
   useEffect(() => {
     if (!state.sortedFeatures || state.sortedFeatures.length < 1) return;
     mapFeatures(hotelSelected);
-  }, [state.editViewType, state.mapView, state.sortedFeatures, hotelSelected]);
+    // if(state.hotelData.length > 0) setHotelSelected(false)
+  }, [
+    state.editViewType,
+    state.mapView,
+    state.sortedFeatures,
+    hotelSelected,
+    state.hotelSelected,
+    state.hotelDeleted
+  ]);
 
   return (
     <Wrapper>
@@ -255,7 +267,10 @@ const MapComponent = () => {
         {markers}
         {routes}
         {!hotelSelected && features}
-        {hotelSelected && state.editViewType === "hotel" && mapSelectedHotel()}
+        {hotelSelected &&
+          state.editViewType === "hotel" &&
+          state.hotelData.length > 1 &&
+          mapSelectedHotel()}
       </Map>
     </Wrapper>
   );
