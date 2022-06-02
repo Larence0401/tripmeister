@@ -24,7 +24,9 @@ const DeleteStop = () => {
   const deleteStop = () => {
     setIsDeleted(true);
     let newItinerary = [...state.itinerary];
+    console.log(newItinerary);
     newItinerary.splice(index, 1);
+    console.log(newItinerary)
     if (!isLastStop && index !== 0) patchRoute();
     dispatch({ type: "updateItinerary", payload: newItinerary });
   };

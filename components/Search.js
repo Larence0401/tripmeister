@@ -186,6 +186,8 @@ const Search = () => {
     setNewDate(date);
   }, [state.itinerary.length]);
 
+  console.log(state.itinerary)
+
   return (
     <Wrapper className={slideIn}>
       {state.itinerary.length === 0 || state.editView ? (
