@@ -43,8 +43,8 @@ const Search = () => {
 
   const updatedStart = start ? start : state.selectedStopData[0];
   const updatedEnd = end ? end : state.selectedStopData[1];
-  const updatedDate = newDate ? newDate : state.selectedStopData[2];
-  const updatedStopData = [updatedStart, updatedEnd, updatedDate];
+  const updatedDate =  state.selectedStopData[2];
+  const updatedStopData = [updatedStart, updatedEnd, updatedDate, {accommodation: ""}, {activities: []}, {stayOvernight: true}];
   const isStayOvernight =
     state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight;
 
@@ -87,15 +87,18 @@ const Search = () => {
   };
 
   const updateItinerary = () => {
-    const index = state?.selectedStopData?.[5]?.["index"];
+    const index = state?.selectedStopData?.[6]?.["index"];
     if (!state.selectedStopData) return;
     let arr = updateCurrentStop(index);
+    console.log(arr)
     if (index > 0 && state.itinerary.length > 0) {
       const newPrevStop = updateLastStop(index);
       arr.splice(index - 1, 1, newPrevStop);
     }
     if (index < state.itinerary.length - 1) {
       const newNextStop = updateNextStop(index);
+      console.log(arr)
+      console.log(newNextStop)
       arr.splice(index + 1, 1, newNextStop);
     }
     dispatch({ type: "updateItinerary", payload: arr });
@@ -187,6 +190,7 @@ const Search = () => {
   }, [state.itinerary.length]);
 
   console.log(state.itinerary)
+  console.log(state.routeData)
 
   return (
     <Wrapper className={slideIn}>

@@ -20,13 +20,12 @@ const DeleteStop = () => {
   const index = state.selectedStopData[6]["index"];
   const isLastStop = index === state.itinerary.length - 1;
   const route = useRecalculateRoute();
+  const [newRoute, setNewRoute] = useState([])
 
   const deleteStop = () => {
     setIsDeleted(true);
     let newItinerary = [...state.itinerary];
-    console.log(newItinerary);
     newItinerary.splice(index, 1);
-    console.log(newItinerary)
     if (!isLastStop && index !== 0) patchRoute();
     dispatch({ type: "updateItinerary", payload: newItinerary });
   };
@@ -48,7 +47,7 @@ const DeleteStop = () => {
       return [coords];
     });
     const newRoute = await Promise.all(result);
-    dispatch({ type: "updateRouteData", payload: newRoute });
+   setNewRoute(newRoute);
   };
 
   const handleClick = () => {
@@ -56,9 +55,41 @@ const DeleteStop = () => {
     dispatch({ type: "setEditView", payload: "directions" });
   };
 
+  const filterRouteSections = () => {
+        const arr = state.itinerary.map(stage => {
+        const lonFirst = stage?.[0]?.coordinates?.[0].toFixed(2)
+        const latFirst = stage?.[0]?.coordinates?.[1].toFixed(2)
+        const lonLast = stage?.[1]?.coordinates?.[0].toFixed(2)
+        const latLast = stage?.[1]?.coordinates?.[1].toFixed(2)
+        return [lonFirst,latFirst,lonLast,latLast]
+      })
+
+      const filteredRouteData = []
+      newRoute.forEach((el,i) => {
+        const lonFirst = el[0].geometry.coordinates[0][0].toFixed(2)
+        const latFirst = el[0].geometry.coordinates[0][1].toFixed(2)
+        const lonLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][0].toFixed(2)
+        const latLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][1].toFixed(2)
+        const endPointCoordinates = [lonFirst,latFirst,lonLast,latLast]
+        if(arr.some(it => JSON.stringify(it) === JSON.stringify(endPointCoordinates))) filteredRouteData.push(el)
+
+      })
+      return filteredRouteData
+    // })
+  }
+
+useEffect(() => {
+  if(state.itinerary.length === state.routeData.length) return
+  filterRouteSections()
+},[newRoute])
+
   useEffect(() => {
-    getRoute();
+    recalculateRoute()
   }, [state.itinerary]);
+
+  console.log(state.itinerary)
+  console.log(state.routeData)
+
 
   return (
     <Wrapper>

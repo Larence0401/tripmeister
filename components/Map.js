@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import tw from "tailwind-styled-components";
 import Map, { Marker, Source, Layer } from "react-map-gl";
 import { useAppContext } from "../store/appContext";
@@ -14,9 +14,10 @@ const MapComponent = () => {
   const { state, dispatch } = useAppContext();
   const [zoomedOut, setZoomedOut] = useState(false);
   const [hotelSelected, setHotelSelected] = useState(false);
+  const [filteredRouteData, setFilteredRouteData] = useState([])
   const mapRef = useRef();
   const [features, mapFeatures] = useMapFeatures();
-  console.log(hotelSelected);
+
 
   const getMarkers = (no) => {
     if (state.itinerary?.length < 1) return;
@@ -38,7 +39,7 @@ const MapComponent = () => {
     height: "100%",
   });
 
-  const getRoute = async () => {
+  const getRoute = useCallback(async () => {
     const query = await fetch(
       `https://api.mapbox.com/directions/v5/mapbox/driving/${marker1[0]},${marker1[1]};${marker2[0]},${marker2[1]}?steps=true&geometries=geojson&access_token=${process.env.mapbox_key}`,
       { method: "GET" }
@@ -56,7 +57,7 @@ const MapComponent = () => {
     };
 
     dispatch({ type: "storeRouteData", payload: [geojson] });
-  };
+  },[state.itinerary]);
 
   const getMarkerColor = (stop) =>
     stop?.[5]?.stayOvernight ? "bg-green-300" : "";
@@ -70,7 +71,6 @@ const MapComponent = () => {
         : state.editViewType === "restaurants"
         ? [...state.restaurantData]
         : [...state.itinerary];
-    console.log(arr);
 
     const array = [];
     let coordinates_array = arr.map((el) => {
@@ -90,9 +90,8 @@ const MapComponent = () => {
   };
 
   const getFitBounds = () => {
-    console.log("getFitbounds");
     if (state.itinerary.length < 1) return;
-    console.log("getFitbounds after");
+
     const latitudes_array = getCoordinates("lat");
     const longitudes_array = getCoordinates("long");
     const minLat = latitudes_array.sort()[0];
@@ -127,7 +126,7 @@ const MapComponent = () => {
     if (state.editViewType === "restaurants" && state.restaurantData.length < 1)
       return;
     if (state.itinerary.length === 0) return;
-    getRoute();
+   // getRoute();
     const phantomMarkers = modifyFitBounds();
     const markerPair =
       window.innerWidth >= 1024 ? phantomMarkers : [marker1, marker2];
@@ -137,11 +136,6 @@ const MapComponent = () => {
       state.editViewType === "restaurants"
         ? getFitBounds()
         : markerPair;
-    console.log(phantomMarkers);
-    console.log(fitBounds);
-    console.log(marker1);
-    console.log(marker2);
-    console.log(hotelSelected);
     mapRef.current?.fitBounds(fitBounds, { padding: 60 });
     modifyFitBounds();
     checkIfHotelSelected();
@@ -154,6 +148,8 @@ const MapComponent = () => {
     state.restaurantData,
     state.editView,
   ]);
+
+  useCallback
 
   const StartMarkerProps = {
     color: "#000000",
@@ -184,6 +180,48 @@ const MapComponent = () => {
     return <Marker color={colors[0]} longitude={lon} latitude={lat} />;
   };
 
+  const filterRouteSections = () => {
+    const arr = state.itinerary.map(stage => {
+    const lonFirst = stage?.[0]?.coordinates?.[0].toFixed(1)
+    const latFirst = stage?.[0]?.coordinates?.[1].toFixed(1)
+    const lonLast = stage?.[1]?.coordinates?.[0].toFixed(1)
+    const latLast = stage?.[1]?.coordinates?.[1].toFixed(1)
+    return [lonFirst,latFirst,lonLast,latLast]
+  })
+
+  const filteredRouteData = []
+  state.routeData.forEach((el,i) => {
+    const lonFirst = el[0].geometry.coordinates[0][0].toFixed(1)
+    const latFirst = el[0].geometry.coordinates[0][1].toFixed(1)
+    const lonLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][0].toFixed(1)
+    const latLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][1].toFixed(1)
+    const endPointCoordinates = [lonFirst,latFirst,lonLast,latLast]
+    if(arr.some(it => JSON.stringify(it) === JSON.stringify(endPointCoordinates))) setFilteredRouteData(prev => [...prev, el])
+
+  })
+
+
+// })
+}
+
+// const getRoutes = () => {
+//   if(state.routeData.length < 1) return
+//   const filteredRoutes = filterRouteSections()
+//   const routes = filteredRoutes.map((route,index) => {
+//     return (
+//       <Source
+//           id={index.toString()}
+//           type="geojson"
+//           data={route[0]}
+//           key={index}
+//         >
+//           <Layer type="line" />
+//         </Source>
+//     )
+//   })
+// }
+
+
   const markers =
     state.itinerary.length > 0
       ? state.itinerary.map((stop, index) => (
@@ -196,24 +234,33 @@ const MapComponent = () => {
         ))
       : null;
 
-  const routes =
+  const routes = 
     state.routeData.length > 0
-      ? state.routeData.map((route, index) => (
-          <Source
-            id={index.toString()}
-            type="geojson"
-            data={route[0]}
-            key={index}
-          >
-            <Layer type="line" />
-          </Source>
-        ))
-      : null;
+    ? state.routeData.map((route, index) => (
+        <Source
+          id={index.toString()}
+          type="geojson"
+          data={route[0]}
+          key={index}
+        >
+          <Layer type="line" />
+        </Source>
+      ))
+    : null;
+
+ // const routes = getRoutes()
+
+
+  useEffect(() => {
+    filterRouteSections()
+  },[state.routeData])
+  
+    
 
   useEffect(() => {
     if (!state.sortedFeatures || state.sortedFeatures.length < 1) return;
     mapFeatures(hotelSelected);
-    // if(state.hotelData.length > 0) setHotelSelected(false)
+     if(state.hotelDeleted) setHotelSelected(false)
   }, [
     state.editViewType,
     state.mapView,
@@ -222,6 +269,9 @@ const MapComponent = () => {
     state.hotelSelected,
     state.hotelDeleted
   ]);
+  console.log(state.itinerary)
+  console.log(state.routeData)
+  // useEffect(() => getRoutes(),[state.routeData])
 
   return (
     <Wrapper>
