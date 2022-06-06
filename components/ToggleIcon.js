@@ -1,45 +1,47 @@
-import tw from "tailwind-styled-components"
-import {useAppContext} from '../store/appContext'
+import tw from "tailwind-styled-components";
+import { useAppContext } from "../store/appContext";
 
-const ToggleIcon = () => {
+const ToggleIcon2 = () => {
+    const {state, dispatch} = useAppContext()
+    const open1 = state.sidebarIsOpen ? "top-[18px] w-[0%] l-[50%]" : null
+    const open2 = state.sidebarIsOpen ? "rotate-[45deg]" : null
+    const open3 = state.sidebarIsOpen ? "rotate-[-45deg]" : null
+    const open4 = state.sidebarIsOpen ? "top-[12px] w-[0%] l-[50%]" : null
 
-    const {state,dispatch} = useAppContext()
-    const isVisible = state.sidebarIsOpen ? "opacity-0" : null
-    const isSkewed = state.sidebarIsOpen ? "rotate-[135deg] mt-[8px]" : null
-    const isSkewed2 = state.sidebarIsOpen ? "-rotate-[135deg] -mt-[9px]" : null
-    
-  
   return (
-    <div className="relative">
-        <Hamburger onClick={() => dispatch({type: 'openSidebar'})}>
-            <HorizontalBar className={`transition-all duration-300 box-border relative float-left ${isSkewed}`}/>
-            <HorizontalBar className={`transition-all duration-300 box-border relative float-left mt-[3px] ${isVisible}`}/>
-            <HorizontalBar className={`transition-all duration-300 box-border relative float-left mt-[3px] ${isSkewed2}`}/>
-        </Hamburger>
-    </div>
-  )
-}
+    <Hamburger onClick={() => dispatch({type: 'openSidebar'})}>
+      <Bar className={`top-0 ${open1}`}></Bar>
+      <Bar className={`top-[12px] ${open2}`}></Bar>
+      <Bar className={`top-[12px] ${open3}`}></Bar>
+      <Bar className={`top-[24px] ${open4}`}></Bar>
+    </Hamburger>
+  );
+};
 
-export default ToggleIcon
+export default ToggleIcon2;
 
 const Hamburger = tw.div`
-    transition-all
-    duration-300
-    box-border
+    w-[40px]
+    h-[30px]
+    relative
     z-90
-    h-full
-    w-full
-    top-[22px]
-    left-[15px]
-    h-[22px]
-    w-[22px]
+    pointer
+    rotate-[0deg]
+    ease-out
+    duration-500
+    m-[50px auto]
 `
-const HorizontalBar = tw.div`
-    transition-all
-    duration-300
-    box-border
-    absolute
-    h-[3px]
-    w-full
-    bg-white
-`
+
+const Bar = tw.div`
+block
+absolute
+h-[6px]
+w-full
+bg-white
+rounded-[6px]
+opacity-100
+left-[0]
+transition-all
+duration-250
+ease-in-out
+`;

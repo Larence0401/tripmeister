@@ -11,9 +11,9 @@ const ItineraryItem = ({ item, index }) => {
   const { state, dispatch } = useAppContext();
   const startingpoint = item[0].place.split(",")[0];
   const destinationpoint = item[1].place.split(",")[0];
-  const startCoords = state?.itinerary[index][0].coordinates
-  const endCoords = state?.itinerary[index][1].coordinates
-    const formattedTime = format(item[2], "dd MMM");
+  const startCoords = state?.itinerary[index][0].coordinates;
+  const endCoords = state?.itinerary[index][1].coordinates;
+  const formattedTime = format(item[2], "dd MMM");
   const [rideDetails, setRideDetails] = useState("");
   const duration =
     rideDetails !== "" ? getFormattedTime(rideDetails.duration) : "";
@@ -30,12 +30,10 @@ const ItineraryItem = ({ item, index }) => {
       ? "italic font-semibold"
       : "";
 
-  const zoomIntoSelectedStage = () => {};
-
   const handleClick = (action) => {
     const type = action === "delete" ? "setDeleteView" : "setEditView";
     dispatch({ type, payload: true });
-    dispatch({type: 'setEditViewType', payload: 'directions'})
+    dispatch({ type: "setEditViewType", payload: "directions" });
     dispatch({ type: "selectStop", payload: [...item, { index: index }] });
     dispatch({ type: "startValue", payload: "" });
     dispatch({ type: "endValue", payload: "" });
@@ -43,13 +41,10 @@ const ItineraryItem = ({ item, index }) => {
 
   useEffect(() => {
     (async () => {
-      const details = await getRideDetails(startCoords,endCoords);
+      const details = await getRideDetails(startCoords, endCoords);
       setRideDetails(details);
     })();
   }, []);
-
-  console.log(state?.selectedStopData);
-  console.log(state.itinerary);
 
   return (
     <Wrapper

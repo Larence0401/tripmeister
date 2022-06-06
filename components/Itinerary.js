@@ -24,7 +24,7 @@ const Itinerary = () => {
   const handleClick = () => {
     dispatch({ type: "setEditView", payload: false });
     dispatch({ type: "setEditViewType", payload: "directions" });
-    dispatch({type: "selectStop", payload: []})
+    dispatch({ type: "selectStop", payload: [] });
   };
 
   return (
@@ -42,9 +42,10 @@ const Itinerary = () => {
           onClick={() => dispatch({ type: "setMapView", payload: true })}
         />
       </div>
-      {state.itinerary.length > 0 && !state.editView && !state.readingMode && (
-        <SaveTrip/>
-      )}
+      {state.itinerary.length > 0 &&
+        !state.editView &&
+        !state.readingMode &&
+        !state.deleteView && <SaveTrip />}
       {state.deleteView ? (
         <DeleteStop listItem={listItem} />
       ) : (

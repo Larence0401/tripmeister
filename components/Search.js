@@ -6,24 +6,23 @@ import { useAppContext } from "../store/appContext";
 import AutocompleteList from "./AutocompleteList";
 import getStartingLocation from "../utils/getStartingLocation";
 import getEndLocation from "../utils/getEndLocation";
-import getRoute from "../utils/getRoute";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import HotelIcon from "@mui/icons-material/Hotel";
+import useGetRoute from "../hooks/useGetRoute";
 
 const Search = () => {
   const { dispatch, state } = useAppContext();
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [newDate, setNewDate] = useState(new Date());
-  const [datePlus, setDatePlus] = useState(new Date());
+  const getRoute = useGetRoute();
   const accommodation = state.itinerary?.[3]?.id
     ? state.itinerary?.[3]
     : { accommodation_test: "" };
   const activities = { activities: [] };
   const [focus, setFocus] = useState("");
   const [stayOvernight, setStayOvernight] = useState({ stayOvernight: true });
-  const [isUpdated, setIsUpdated] = useState({ start: false, end: false });
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const bedColor = stayOvernight.stayOvernight
     ? "text-blue-500"
@@ -43,8 +42,15 @@ const Search = () => {
 
   const updatedStart = start ? start : state.selectedStopData[0];
   const updatedEnd = end ? end : state.selectedStopData[1];
-  const updatedDate =  state.selectedStopData[2];
-  const updatedStopData = [updatedStart, updatedEnd, updatedDate, {accommodation: ""}, {activities: []}, {stayOvernight: true}];
+  const updatedDate = state.selectedStopData[2];
+  const updatedStopData = [
+    updatedStart,
+    updatedEnd,
+    updatedDate,
+    { accommodation: "" },
+    { activities: [] },
+    { stayOvernight: true },
+  ];
   const isStayOvernight =
     state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight;
 
@@ -80,25 +86,16 @@ const Search = () => {
     dispatch({ type: "endValue", payload: "" });
   };
 
-  const getNewStartDate = () => {
-    const isStayOvernight =
-      state.itinerary?.[state.itinerary?.length - 1]?.[5]?.stayOvernight;
-    if (isStayOvernight) addDay();
-  };
-
   const updateItinerary = () => {
     const index = state?.selectedStopData?.[6]?.["index"];
     if (!state.selectedStopData) return;
     let arr = updateCurrentStop(index);
-    console.log(arr)
     if (index > 0 && state.itinerary.length > 0) {
       const newPrevStop = updateLastStop(index);
       arr.splice(index - 1, 1, newPrevStop);
     }
     if (index < state.itinerary.length - 1) {
       const newNextStop = updateNextStop(index);
-      console.log(arr)
-      console.log(newNextStop)
       arr.splice(index + 1, 1, newNextStop);
     }
     dispatch({ type: "updateItinerary", payload: arr });
@@ -188,9 +185,6 @@ const Search = () => {
     const date = new Date(datePlus);
     setNewDate(date);
   }, [state.itinerary.length]);
-
-  console.log(state.itinerary)
-  console.log(state.routeData)
 
   return (
     <Wrapper className={slideIn}>

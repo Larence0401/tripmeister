@@ -3,7 +3,7 @@ import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 
 const Main = ({ children }) => {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
   const isHidden = state.sidebarIsOpen && window.innerWidth <= 1024 ? "hidden" : ""
 
   return (

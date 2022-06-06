@@ -18,7 +18,8 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
 
   const [accommodationType, setAccommodationType] = useState("hotel");
   const [hotelData, setHotelData] = useState([]);
-  const [index, setSelectedIndex] = useState(null);
+  //const [index, setSelectedIndex] = useState(null);
+  const index = state?.selectedStopData?.[6].index;
   const [detailsShown, setDetailsShown] = useState(null);
   const [selected, setSelected] = useState(false);
   const coords = state?.selectedStopData?.[1]?.["coordinates"];
@@ -40,8 +41,8 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
     setHotelSelected(true);
     setIsEditMode(false);
     const arr = [...state.itinerary];
-   const hotel = sortedFeatures[selected].data
-    const index = state.selectedStopData[6]["index"];
+    const hotel = sortedFeatures[selected].data;
+   // const index = state.selectedStopData[6]["index"];
     arr[index].splice(3, 1, hotel);
     dispatch({ type: "updateItinerary", payload: arr });
   };
@@ -59,20 +60,14 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
   useEffect(() => {
     (async () => {
       const hotelData = await getHotels(accommodationType, coords);
-      console.log(hotelData);
       setHotelData(hotelData);
       dispatch({ type: "setHotelData", payload: hotelData });
     })();
   }, [accommodationType, state.selectedStopData]);
 
   useEffect(() => {
-    if (distance) console.log(distance);
     sortFeaturesByDistance(distance, hotelData);
   }, [distance]);
-
-  useEffect(() => {
-    if (sortedFeatures) console.log(sortedFeatures);
-  }, [sortedFeatures]);
 
   return (
     <>
@@ -118,13 +113,13 @@ const HotelSuggestions = ({ setHotelSelected, setIsEditMode }) => {
                       <ArrowDropUpIcon
                         onClick={() => setDetailsShown(null)}
                         fontSize="medium"
-                        style={{color: colors[i]}}
+                        style={{ color: colors[i] }}
                       />
                     ) : (
                       <ArrowDropDownIcon
                         onClick={() => setDetailsShown(i)}
                         fontSize="large"
-                        style={{color: colors[i]}}
+                        style={{ color: colors[i] }}
                       />
                     )}
                   </Icon>

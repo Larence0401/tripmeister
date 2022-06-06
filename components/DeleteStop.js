@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppContext } from "../store/appContext";
 import tw from "tailwind-styled-components";
 import getFormattedDate from "../utils/getFormattedDate";
 import getEndLocation from "../utils/getEndLocation";
 import getStartingLocation from "../utils/getStartingLocation";
-import useRecalculateRoute from "../hooks/useRecalculateRoute";
-import getRoute from "../utils/getRoute";
 
 // This component not only lets the user delete a stage of the itinerary, but also recalculates the route based on the new stops after deletion.
 
@@ -19,8 +17,6 @@ const DeleteStop = () => {
   const stageDetails = deleted ? "line-through text-gray-600" : "";
   const index = state.selectedStopData[6]["index"];
   const isLastStop = index === state.itinerary.length - 1;
-  const route = useRecalculateRoute();
-  const [newRoute, setNewRoute] = useState([])
 
   const deleteStop = () => {
     setIsDeleted(true);
@@ -39,62 +35,15 @@ const DeleteStop = () => {
     dispatch({ type: "patchRoute", payload: newItinerary });
   };
 
-  const recalculateRoute = async () => {
-    const result = state.itinerary.map(async (el) => {
-      const startCoords = el[0]["coordinates"];
-      const endCoords = el[1]["coordinates"];
-      const coords = await getRoute(startCoords, endCoords);
-      return [coords];
-    });
-    const newRoute = await Promise.all(result);
-   setNewRoute(newRoute);
-  };
-
   const handleClick = () => {
     dispatch({ type: "setDeleteView", payload: false });
     dispatch({ type: "setEditView", payload: "directions" });
   };
 
-  const filterRouteSections = () => {
-        const arr = state.itinerary.map(stage => {
-        const lonFirst = stage?.[0]?.coordinates?.[0].toFixed(2)
-        const latFirst = stage?.[0]?.coordinates?.[1].toFixed(2)
-        const lonLast = stage?.[1]?.coordinates?.[0].toFixed(2)
-        const latLast = stage?.[1]?.coordinates?.[1].toFixed(2)
-        return [lonFirst,latFirst,lonLast,latLast]
-      })
-
-      const filteredRouteData = []
-      newRoute.forEach((el,i) => {
-        const lonFirst = el[0].geometry.coordinates[0][0].toFixed(2)
-        const latFirst = el[0].geometry.coordinates[0][1].toFixed(2)
-        const lonLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][0].toFixed(2)
-        const latLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][1].toFixed(2)
-        const endPointCoordinates = [lonFirst,latFirst,lonLast,latLast]
-        if(arr.some(it => JSON.stringify(it) === JSON.stringify(endPointCoordinates))) filteredRouteData.push(el)
-
-      })
-      return filteredRouteData
-    // })
-  }
-
-useEffect(() => {
-  if(state.itinerary.length === state.routeData.length) return
-  filterRouteSections()
-},[newRoute])
-
-  useEffect(() => {
-    recalculateRoute()
-  }, [state.itinerary]);
-
-  console.log(state.itinerary)
-  console.log(state.routeData)
-
-
   return (
     <Wrapper>
       <ArrowBackIcon
-        className="self-start mb-4"
+        className="self-start mb-4 cursor-pointer text-slate-700 hover:text-slate-900"
         fontSize="large"
         onClick={() => handleClick()}
       />

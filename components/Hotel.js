@@ -29,19 +29,15 @@ const Hotel = () => {
     const arr = state?.itinerary;
     arr?.[index].splice(3, 1, { accommodation: "no accommodation selected" });
     dispatch({ type: "updateItinerary", payload: arr });
-    dispatch({type: 'setHotelData', payload: []})
-    dispatch({type: 'setHotelDeleted', payload: true})
-    setHotelSelected(false)
+    dispatch({ type: "setHotelData", payload: [] });
+    dispatch({ type: "setHotelDeleted", payload: true });
+    setHotelSelected(false);
   };
-
-  console.log(state.hotelData.length)
-  console.log((!hotelSelected && !hotelName) || isEditMode)
-  console.log((!hotelSelected && !hotelName) || isEditMode) && state.hotelData.length < 1
 
   return (
     <Wrapper className={slideIn}>
       {(hotelSelected || (hotelName && !hotelSelected)) &&
-        (!isEditMode || !state.editMode) &&  (
+        (!isEditMode || !state.editMode) && (
           <HotelData>
             <div className="flex flex-col">
               <HotelName>{hotelName}</HotelName>

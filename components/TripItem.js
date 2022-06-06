@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../store/appContext";
-import { useAuth, db } from "../firebase";
+import { db } from "../firebase";
 import { deleteDoc, getDoc, doc } from "firebase/firestore";
 import tw from "tailwind-styled-components";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import useRecalculateRoute from "../hooks/useRecalculateRoute";
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 const TripItem = ({ trip, user }) => {
   const { dispatch, state } = useAppContext();
-  //const user = useAuth();
-  const recalculateRoute = useRecalculateRoute();
   const docRef = doc(db, "users", user.uid, "itineraries", trip.id);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -28,10 +25,10 @@ const TripItem = ({ trip, user }) => {
 
   const initEditMode = async () => {
     loadItinerary();
-    dispatch({type: "setEditView", payload: true})
+    dispatch({ type: "setEditView", payload: true });
     dispatch({ type: "setReadingMode", payload: false });
-    dispatch({type: "setEditViewType", payload: "directions"})
-  }
+    dispatch({ type: "setEditViewType", payload: "directions" });
+  };
 
   const loadItinerary = async () => {
     const docSnap = await getDoc(docRef);

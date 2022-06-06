@@ -7,17 +7,16 @@ import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import MapIcon from "@mui/icons-material/Map";
 import useMapFeatures from "../hooks/useMapFeatures";
-import useSortFeaturesByDistance from "../hooks/useSortFeaturesByDistance";
+import useGetRoute from "../hooks/useGetRoute";
 import getColors from "../utils/getColors";
 
 const MapComponent = () => {
   const { state, dispatch } = useAppContext();
   const [zoomedOut, setZoomedOut] = useState(false);
   const [hotelSelected, setHotelSelected] = useState(false);
-  const [filteredRouteData, setFilteredRouteData] = useState([])
   const mapRef = useRef();
   const [features, mapFeatures] = useMapFeatures();
-
+  const getRoute = useGetRoute();
 
   const getMarkers = (no) => {
     if (state.itinerary?.length < 1) return;
@@ -39,25 +38,11 @@ const MapComponent = () => {
     height: "100%",
   });
 
-  const getRoute = useCallback(async () => {
-    const query = await fetch(
-      `https://api.mapbox.com/directions/v5/mapbox/driving/${marker1[0]},${marker1[1]};${marker2[0]},${marker2[1]}?steps=true&geometries=geojson&access_token=${process.env.mapbox_key}`,
-      { method: "GET" }
-    );
-    const json = await query.json();
-    const data = json.routes[0];
-    const route = data.geometry.coordinates;
-    const geojson = {
-      type: "Feature",
-      properties: {},
-      geometry: {
-        type: "LineString",
-        coordinates: route,
-      },
-    };
+  const setRoute = useCallback(async () => {
+    const route = getRoute();
 
-    dispatch({ type: "storeRouteData", payload: [geojson] });
-  },[state.itinerary]);
+    dispatch({ type: "storeRouteData", payload: [route] });
+  }, [state.itinerary]);
 
   const getMarkerColor = (stop) =>
     stop?.[5]?.stayOvernight ? "bg-green-300" : "";
@@ -126,7 +111,6 @@ const MapComponent = () => {
     if (state.editViewType === "restaurants" && state.restaurantData.length < 1)
       return;
     if (state.itinerary.length === 0) return;
-   // getRoute();
     const phantomMarkers = modifyFitBounds();
     const markerPair =
       window.innerWidth >= 1024 ? phantomMarkers : [marker1, marker2];
@@ -148,8 +132,6 @@ const MapComponent = () => {
     state.restaurantData,
     state.editView,
   ]);
-
-  useCallback
 
   const StartMarkerProps = {
     color: "#000000",
@@ -180,48 +162,6 @@ const MapComponent = () => {
     return <Marker color={colors[0]} longitude={lon} latitude={lat} />;
   };
 
-  const filterRouteSections = () => {
-    const arr = state.itinerary.map(stage => {
-    const lonFirst = stage?.[0]?.coordinates?.[0].toFixed(1)
-    const latFirst = stage?.[0]?.coordinates?.[1].toFixed(1)
-    const lonLast = stage?.[1]?.coordinates?.[0].toFixed(1)
-    const latLast = stage?.[1]?.coordinates?.[1].toFixed(1)
-    return [lonFirst,latFirst,lonLast,latLast]
-  })
-
-  const filteredRouteData = []
-  state.routeData.forEach((el,i) => {
-    const lonFirst = el[0].geometry.coordinates[0][0].toFixed(1)
-    const latFirst = el[0].geometry.coordinates[0][1].toFixed(1)
-    const lonLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][0].toFixed(1)
-    const latLast = el[0].geometry.coordinates[el[0].geometry.coordinates.length-1][1].toFixed(1)
-    const endPointCoordinates = [lonFirst,latFirst,lonLast,latLast]
-    if(arr.some(it => JSON.stringify(it) === JSON.stringify(endPointCoordinates))) setFilteredRouteData(prev => [...prev, el])
-
-  })
-
-
-// })
-}
-
-// const getRoutes = () => {
-//   if(state.routeData.length < 1) return
-//   const filteredRoutes = filterRouteSections()
-//   const routes = filteredRoutes.map((route,index) => {
-//     return (
-//       <Source
-//           id={index.toString()}
-//           type="geojson"
-//           data={route[0]}
-//           key={index}
-//         >
-//           <Layer type="line" />
-//         </Source>
-//     )
-//   })
-// }
-
-
   const markers =
     state.itinerary.length > 0
       ? state.itinerary.map((stop, index) => (
@@ -234,44 +174,32 @@ const MapComponent = () => {
         ))
       : null;
 
-  const routes = 
+  const routes =
     state.routeData.length > 0
-    ? state.routeData.map((route, index) => (
-        <Source
-          id={index.toString()}
-          type="geojson"
-          data={route[0]}
-          key={index}
-        >
-          <Layer type="line" />
-        </Source>
-      ))
-    : null;
-
- // const routes = getRoutes()
-
-
-  useEffect(() => {
-    filterRouteSections()
-  },[state.routeData])
-  
-    
+      ? state.routeData.map((route, index) => (
+          <Source
+            id={index.toString()}
+            type="geojson"
+            data={route[0]}
+            key={index}
+          >
+            <Layer type="line" />
+          </Source>
+        ))
+      : null;
 
   useEffect(() => {
     if (!state.sortedFeatures || state.sortedFeatures.length < 1) return;
     mapFeatures(hotelSelected);
-     if(state.hotelDeleted) setHotelSelected(false)
+    if (state.hotelDeleted) setHotelSelected(false);
   }, [
     state.editViewType,
     state.mapView,
     state.sortedFeatures,
     hotelSelected,
     state.hotelSelected,
-    state.hotelDeleted
+    state.hotelDeleted,
   ]);
-  console.log(state.itinerary)
-  console.log(state.routeData)
-  // useEffect(() => getRoutes(),[state.routeData])
 
   return (
     <Wrapper>
@@ -287,13 +215,13 @@ const MapComponent = () => {
       >
         {zoomedOut ? (
           <ZoomInMapIcon
-            className="absolute m-4 lg:m-8 z-90 text-slate-900 rounded-md lg:right-0"
+            className="absolute m-4 lg:m-8 z-90 text-slate-900 rounded-md lg:right-0 cursor-pointer"
             fontSize="large"
             onClick={() => setZoomedOut(false)}
           />
         ) : (
           <ZoomOutMapIcon
-            className="absolute m-4 lg:m-8 z-90 bg-white/[.06] rounded-md lg:right-0"
+            className="absolute m-4 lg:m-8 z-90 bg-white/[.06] rounded-md lg:right-0 cursor-pointer"
             fontSize="large"
             onClick={() => setZoomedOut(true)}
           />
