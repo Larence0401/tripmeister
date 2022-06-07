@@ -67,7 +67,6 @@ const TripItem = ({ trip, user }) => {
 
   useEffect(() => {
     state.itinerary.length > 0 ? preselectFirstStage() : null;
-    recalculateRoute();
   }, [state.itinerary]);
 
   return (
