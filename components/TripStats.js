@@ -51,8 +51,11 @@ const TripStats = () => {
       setRideDetails(details)
       getTotalValue("duration")
       getTotalValue("distance")
+      getDateDifference(date1,date2)
+      getStartingLocation(state.selectedStopData)
+      getEndLocation(state.selectedStopData)
     })()
-  },[start,stop])
+  },[start,stop,state.itinerary,state.selectedStopData])
 
   return (
     <Wrapper className={slideIn}>

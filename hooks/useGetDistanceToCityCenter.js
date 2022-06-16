@@ -10,7 +10,6 @@ const useGetDistanceToCityCenter = (hotelData) => {
 
   const getDistanceToCityCenter = async (hotelData) => {
     if (!hotelData) return;
-    console.log(hotelData)
     const result = hotelData.map(async (el) => {
       const end = el.center;
       const data = await getRideDetails(coords, end);
