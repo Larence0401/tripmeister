@@ -36,9 +36,12 @@ const EditViewSelect = dynamic(() => import("../components/EditViewSelect"), {
   ssr: false,
 });
 
+
+
 export default function Home() {
   const { state } = useAppContext();
   const user = useAuth();
+  const viewportHeight = (state.editViewType === "info" || state.editViewType === "hotel") ? "h-[150vh]" : "h-screen"
 
   useEffect(() => {
     if (!user) return;
@@ -46,7 +49,7 @@ export default function Home() {
   }, [user]);
 
   return (
-    <Wrapper>
+    <Wrapper className={viewportHeight}>
       <Head>
         <title>Tripmeister | travel planning app</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -109,6 +112,7 @@ lg:flex
 lg:flex-col
 justify-center
 items-center
+h-auto
 w-full
 mx-0
     lg:absolute

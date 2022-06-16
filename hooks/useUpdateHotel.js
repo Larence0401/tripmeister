@@ -6,11 +6,10 @@ const useUpdateHotel = (start) => {
 
   const updateHotel = () => {
     const newHotel = start ? start : state.startValue;
-    if(newHotel === "") return
+    if (newHotel === "") return;
     const index = state.selectedStopData[6]["index"];
     const arr = [...state.itinerary];
     arr[index].splice(3, 1, newHotel);
-    console.log("hotel updated")
     dispatch({ type: "updateItinerary", payload: arr });
   };
 

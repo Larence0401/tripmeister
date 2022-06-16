@@ -8,14 +8,12 @@ const TripList = () => {
 
   const [trip, getTripData] = useGetTripData();
 
-  console.log(trip);
   const removeDuplicates = (trip) =>
     Array.from(new Set(trip.map((el) => el.id))).map((id) => {
       return trip.find((el) => el.id === id);
     });
-    
+
   const tripArray = removeDuplicates(trip);
-  console.log(tripArray);
 
   useEffect(() => {
     (async () => await getTripData())();

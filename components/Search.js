@@ -16,6 +16,7 @@ const Search = () => {
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [newDate, setNewDate] = useState(new Date());
+  const [dateUpdated, setDateUpdated] = useState(false)
   const getRoute = useGetRoute();
   const accommodation = state.itinerary?.[3]?.id
     ? state.itinerary?.[3]
@@ -42,7 +43,7 @@ const Search = () => {
 
   const updatedStart = start ? start : state.selectedStopData[0];
   const updatedEnd = end ? end : state.selectedStopData[1];
-  const updatedDate = state.selectedStopData[2];
+  const updatedDate = newDate;
   const updatedStopData = [
     updatedStart,
     updatedEnd,
@@ -121,6 +122,12 @@ const Search = () => {
     return arr;
   };
 
+const handleDateChange = (date) => {
+    setNewDate(date)
+    setDateUpdated(true)
+    setUpdateSubmitted(true)
+}
+
   const fetchSearchResult = async (input) => {
     const location = input === "starting" ? state.startValue : state.endValue;
     if (location.length < 2) return;
@@ -150,12 +157,17 @@ const Search = () => {
     if (end) {
       dispatch({ type: "resetEndSuggestions" });
     }
-    if (updateSubmitted && (start || end) && state.editView) {
+    if (
+      updateSubmitted &&
+      (start || end || dateUpdated) &&
+      state.editView
+    ) {
       updateItinerary();
       setStart(null);
       setEnd(null);
+      setDateUpdated(false);
     }
-  }, [start, end, updateSubmitted]);
+  }, [start, end, updateSubmitted, dateUpdated]);
 
   useEffect(() => setFocus(""), [state.selectedStopData]);
 
@@ -185,6 +197,7 @@ const Search = () => {
     const date = new Date(datePlus);
     setNewDate(date);
   }, [state.itinerary.length]);
+
 
   return (
     <Wrapper className={slideIn}>
@@ -225,7 +238,7 @@ const Search = () => {
             portalId="root-portal"
             className="w-3/4 z-50"
             selected={newDate}
-            onChange={(date) => setNewDate(date)}
+            onChange={(date) => handleDateChange(date)}
             showTimeSelect
             dateFormat="dd.MM.yyyy"
           />

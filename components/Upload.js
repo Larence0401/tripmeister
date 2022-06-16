@@ -41,7 +41,11 @@ const Upload = () => {
   const classes = useStyles();
 
   const handleChange = async (files) => {
-    if (!user) router.push("/login");
+    if (!user) {
+      router.push("/login");
+      dispatch({ type: "setEditViewType", payload: "directions" });
+    }
+
     if (!state.tripName && files.length > 0)
       await dispatch({ type: "requestUpload", payload: true });
     await uploadFile(files);

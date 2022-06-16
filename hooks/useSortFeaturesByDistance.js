@@ -28,7 +28,6 @@ const useSortFeaturesByDistance = () => {
       const num = parseFloat(el.split(" ")[0]);
       return num;
     });
-    console.log(parsedArr)
     let sortedArr = JSON.parse(JSON.stringify(parsedArr));
     sortedArr = sortedArr.sort((a, b) => a - b);
     let arrOfIndices = Array(parsedArr.length).fill(0);

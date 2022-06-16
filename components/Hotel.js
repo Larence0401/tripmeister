@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import tw from "tailwind-styled-components";
 import { useAppContext } from "../store/appContext";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
@@ -36,30 +36,29 @@ const Hotel = () => {
 
   return (
     <Wrapper className={slideIn}>
-      {(hotelSelected || (hotelName && !hotelSelected)) &&
-        (!isEditMode || !state.editMode) && (
-          <HotelData>
-            <div className="flex flex-col">
-              <HotelName>{hotelName}</HotelName>
-              <Address>
-                <LocationOnIcon className="mr-2" />
-                {address}
-              </Address>
-            </div>
-            <Icons>
-              <EditIcon
-                className="mr-2 cursor-pointer text-slate-700 hover:text-slate-900"
-                onClick={() => setIsEditMode(true)}
-              />
-              <DeleteIcon
-                className="cursor-pointer text-slate-700 hover:text-slate-900"
-                onClick={() => deleteHotel()}
-              />
-            </Icons>
-          </HotelData>
-        )}
+      {hotelName && (
+        <HotelData>
+          <div className="flex flex-col">
+            <HotelName>{hotelName}</HotelName>
+            <Address>
+              <LocationOnIcon className="mr-2" />
+              {address}
+            </Address>
+          </div>
+          <Icons>
+            <EditIcon
+              className="mr-2 cursor-pointer text-slate-700 hover:text-slate-900"
+              onClick={() => setIsEditMode(true)}
+            />
+            <DeleteIcon
+              className="cursor-pointer text-slate-700 hover:text-slate-900"
+              onClick={() => deleteHotel()}
+            />
+          </Icons>
+        </HotelData>
+      )}
 
-      {((!hotelSelected && !hotelName) || isEditMode) && (
+      {!hotelName && (
         <SearchSelect>
           <Suggestions onClick={() => setIsSearch(false)}>
             {isSearch ? (
@@ -79,16 +78,13 @@ const Hotel = () => {
           </Search>
         </SearchSelect>
       )}
-
-      {((!hotelSelected && !isSearch && !hotelName) ||
-        (isEditMode && !isSearch)) && (
+      {!hotelName && !isSearch && (
         <HotelSuggestions
           setHotelSelected={setHotelSelected}
           setIsEditMode={setIsEditMode}
         />
       )}
-      {((!hotelSelected && isSearch && !hotelName) ||
-        (isEditMode && isSearch)) && <HotelSearch />}
+      {!hotelName && isSearch && <HotelSearch />}
     </Wrapper>
   );
 };

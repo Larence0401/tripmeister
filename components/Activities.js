@@ -5,6 +5,8 @@ import getStartingLocation from "../utils/getStartingLocation";
 import getEndLocation from "../utils/getEndLocation";
 import { useAppContext } from "../store/appContext";
 
+// this component renders the activitylist component for the starting point and the endpoint of a stage
+
 const Activities = () => {
   const { state } = useAppContext();
   const index = state.selectedStopData[6]["index"];

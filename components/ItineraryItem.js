@@ -33,7 +33,6 @@ const ItineraryItem = ({ item, index }) => {
   const handleClick = (action) => {
     const type = action === "delete" ? "setDeleteView" : "setEditView";
     dispatch({ type, payload: true });
-    dispatch({ type: "setEditViewType", payload: "directions" });
     dispatch({ type: "selectStop", payload: [...item, { index: index }] });
     dispatch({ type: "startValue", payload: "" });
     dispatch({ type: "endValue", payload: "" });
